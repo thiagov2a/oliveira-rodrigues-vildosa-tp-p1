@@ -11,6 +11,7 @@ public class Juego extends InterfaceJuego {
 	// Piso[] pisos;
 	Bloque[] pisoInicial;
 	Lava lava;
+	int ticks;
 
 	Juego() {
 		// Inicializa el objeto entorno
@@ -36,17 +37,22 @@ public class Juego extends InterfaceJuego {
 	public void tick() {
 		// Procesamiento de un instante de tiempo
 		dibujarPiso(pisoInicial);
+		lava.dibujarse(entorno);
+
+		if (ticks % 4 == 0) {
+			lava.subirLava(entorno);
+		}
+
+		ticks++;
+		System.out.println(ticks);
 	}
 
 	// Métodos propios
-	
-	// Dibujar lava
-	// TODO: que la lava no se vaya del rango, con un reloj hacer que la lava suba lentamente
-	public void dibujarLava() {
 
-		lava.dibujarse(entorno);
-	}
-	
+	// Dibujar lava
+	// TODO: que la lava no se vaya del rango, con un reloj hacer que la lava suba
+	// lentamente
+
 	// Dibujar pisos en pantalla
 	public void dibujarPiso(Bloque[] piso) {
 		for (int i = 0; i < piso.length; i++) {
