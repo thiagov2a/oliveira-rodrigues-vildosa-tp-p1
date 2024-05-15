@@ -24,7 +24,7 @@ public class Lava {
 		entorno.dibujarImagen(this.img, this.x, this.y, 0);
 	}
 
-	public void subirLava(Entorno entorno) {
+	public void subir(Entorno entorno) {
 		if (this.y >= 300) {
 			entorno.dibujarImagen(this.img, this.x, --this.y, 0);
 		}

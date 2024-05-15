@@ -11,6 +11,7 @@ public class Juego extends InterfaceJuego {
 	// Piso[] pisos;
 	Bloque[] pisoInicial;
 	Lava lava;
+	Personaje personaje;
 	int ticks;
 
 	Juego() {
@@ -23,6 +24,7 @@ public class Juego extends InterfaceJuego {
 		// Tener en cuenta que la dimensión de la imagen afecta como se ve en pantalla,
 		// por eso los 300px de más
 		lava = new Lava(400, 575 + 300);
+		personaje = new Personaje(400, 505);
 
 		// Inicia el juego!
 		this.entorno.iniciar();
@@ -37,12 +39,20 @@ public class Juego extends InterfaceJuego {
 	public void tick() {
 		// Procesamiento de un instante de tiempo
 		dibujarPiso(pisoInicial);
-		lava.dibujarse(entorno);
-
-		if (ticks % 4 == 0) {
-			lava.subirLava(entorno);
+		
+		personaje.dibujarse(entorno);
+		if (entorno.estaPresionada(entorno.TECLA_DERECHA)) {
+			personaje.moverDerecha(entorno);
+		}
+		if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)) {
+			personaje.moverIzquierda(entorno);
 		}
 
+		lava.dibujarse(entorno);
+		if (ticks % 6 == 0) {
+			lava.subir(entorno);
+		}
+		
 		ticks++;
 		System.out.println(ticks);
 	}
