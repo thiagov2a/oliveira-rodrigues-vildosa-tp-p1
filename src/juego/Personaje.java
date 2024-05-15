@@ -33,13 +33,13 @@ public class Personaje {
 	}
 
 	public void mover(Entorno entorno) {
+		// Actualiza la posición basada en la dirección.
 		this.x += this.direccion ? -this.velocidad : this.velocidad;
 
+		// Asegura que el personaje no salga del entorno visual.
 		if (this.x > entorno.ancho() - this.getAncho() / 2) {
 			this.x = entorno.ancho() - this.getAncho() / 2;
-		}
-
-		if (this.x < this.getAncho() / 2) {
+		} else if (this.x < this.getAncho() / 2) {
 			this.x = this.getAncho() / 2;
 		}
 	}
@@ -54,7 +54,6 @@ public class Personaje {
 
 	public double getTecho() {
 		return this.y - this.getAlto() / 2;
-
 	}
 
 	public double getPiso() {
@@ -63,7 +62,6 @@ public class Personaje {
 
 	public double getIzquierda() {
 		return this.x - this.getAncho() / 2;
-
 	}
 
 	public double getDerecha() {

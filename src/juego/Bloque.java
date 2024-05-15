@@ -7,33 +7,47 @@ import entorno.Herramientas;
 
 public class Bloque {
 
+	// Imágenes estáticas para todos los enemigos, para optimizar recursos.
+	private static final Image BEDROCK = Herramientas.cargarImagen("bedrock.png");
+	private static final Image TIERRA = Herramientas.cargarImagen("piedra.png");
+	private static final Image PIEDRA = Herramientas.cargarImagen("tierra.png");
+
 	private double x;
 	private double y;
-	private boolean esPiedra;
-	private Image img;
+	// Código del tipo de bloque (-1 para bedrock, 0 para tierra, 1 para piedra)
+	private int tipoDeBloque;
 
 	public Bloque() {
 	}
 
-	public Bloque(double x, double y, boolean esPiedra) {
+	public Bloque(double x, double y, int tipoDeBloque) {
 		this.x = x;
 		this.y = y;
-		this.esPiedra = esPiedra;
-		this.img = esPiedra ? Herramientas.cargarImagen("piedra.png") : Herramientas.cargarImagen("tierra.png");
+		this.tipoDeBloque = tipoDeBloque;
 	}
-	
+
 	public void dibujarse(Entorno entorno) {
-		entorno.dibujarImagen(img, x, y, 0);
+		Image img = seleccionarImagen();
+		entorno.dibujarImagen(img, this.x, this.y, 0);
 	}
 	
+	private Image seleccionarImagen() {
+        switch (this.tipoDeBloque) {
+            case -1: return BEDROCK;
+            case 0: return TIERRA;
+            default: return PIEDRA;
+        }
+    }
+
 	public double getAncho() {
-		return img.getWidth(null);
+		return BEDROCK.getWidth(null);
 	}
 
 	public double getAlto() {
-		return img.getHeight(null);
+		return BEDROCK.getHeight(null);
 	}
-
+	
+	//Getter & Setters
 	public double getX() {
 		return x;
 	}
@@ -50,20 +64,24 @@ public class Bloque {
 		this.y = y;
 	}
 
-	public boolean isEsPiedra() {
-		return esPiedra;
+	public int getTipoDeBloque() {
+		return tipoDeBloque;
 	}
 
-	public void setEsPiedra(boolean esPiedra) {
-		this.esPiedra = esPiedra;
+	public void setTipoDeBloque(int tipoDeBloque) {
+		this.tipoDeBloque = tipoDeBloque;
 	}
 
-	public Image getImg() {
-		return img;
+	public static Image getBedrock() {
+		return BEDROCK;
 	}
 
-	public void setImg(Image img) {
-		this.img = img;
+	public static Image getTierra() {
+		return TIERRA;
+	}
+
+	public static Image getPiedra() {
+		return PIEDRA;
 	}
 
 }

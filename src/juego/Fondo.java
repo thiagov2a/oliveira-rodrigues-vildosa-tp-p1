@@ -2,13 +2,15 @@ package juego;
 
 import java.awt.Image;
 
+import entorno.Entorno;
 import entorno.Herramientas;
 
 public class Fondo {
 
+	private static final Image IMG = Herramientas.cargarImagen("fondo.png");
+	
 	private double x;
 	private double y;
-	private Image img;
 	
 	public Fondo() {
 	}
@@ -16,9 +18,21 @@ public class Fondo {
 	public Fondo(double x, double y) {
 		this.x = x;
 		this.y = y;
-		this.img = Herramientas.cargarImagen(null);
+	}
+	
+	public void dibujar(Entorno entorno) {
+		entorno.dibujarImagen(IMG, x, y, 0);
+	}
+	
+	public double getAncho() {
+		return IMG.getWidth(null);
 	}
 
+	public double getAlto() {
+		return IMG.getHeight(null);
+	}
+
+	//Getters & Setters
 	public double getX() {
 		return x;
 	}
@@ -35,12 +49,8 @@ public class Fondo {
 		this.y = y;
 	}
 
-	public Image getImg() {
-		return img;
-	}
-
-	public void setImg(Image img) {
-		this.img = img;
+	public static Image getImg() {
+		return IMG;
 	}
 	
 }

@@ -60,7 +60,6 @@ public class Enemigo {
 
 	public double getIzquierda() {
 		return this.x - this.getAncho() / 2;
-
 	}
 
 	public double getDerecha() {

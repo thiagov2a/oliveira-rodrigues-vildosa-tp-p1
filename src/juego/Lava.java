@@ -7,60 +7,40 @@ import entorno.Herramientas;
 
 public class Lava {
 
+	private static final Image GIF = Herramientas.cargarImagen("lava.gif");
+
 	private double x;
 	private double y;
-	private Image img;
-
+	private double velocidad;
+	
 	public Lava() {
 	}
 
-	public Lava(double x, double y) {
+	public Lava(double x, double y, double velocidad) {
 		this.x = x;
 		this.y = y;
-		this.img = Herramientas.cargarImagen("lava.gif");
+		this.velocidad = velocidad;
 	}
 
 	public void dibujarse(Entorno entorno) {
-		entorno.dibujarImagen(this.img, this.x, this.y, 0);
+		entorno.dibujarImagen(GIF, this.x, this.y, 0);
 	}
 
 	public void subir(Entorno entorno) {
-		double borde = getAlto() / 2;
-		if (this.y >= borde) {
-			entorno.dibujarImagen(this.img, this.x, --this.y, 0);
+		double limiteSuperior = entorno.alto() - this.getAlto() / 2;
+		if (this.y > limiteSuperior) {
+			this.y -= this.velocidad;
 		}
 	}
 
 	public double getAncho() {
-		return img.getWidth(null);
+		return GIF.getWidth(null);
 	}
 
 	public double getAlto() {
-		return img.getHeight(null);
+		return GIF.getHeight(null);
 	}
 
-	public double getX() {
-		return x;
-	}
-
-	public void setX(double x) {
-		this.x = x;
-	}
-
-	public double getY() {
-		return y;
-	}
-
-	public void setY(double y) {
-		this.y = y;
-	}
-
-	public Image getImg() {
-		return img;
-	}
-
-	public void setImg(Image img) {
-		this.img = img;
-	}
+	
 
 }

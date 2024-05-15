@@ -9,9 +9,11 @@ public class Juego extends InterfaceJuego {
 	private Entorno entorno;
 	// Variables propias
 	private Random rand;
+	private Fondo fondo;
 	private Piso[] pisos;
-	private Lava lava;
 	private Personaje personaje;
+	private Lava lava;
+	
 	private int ticks;
 
 	public Juego() {
@@ -20,11 +22,13 @@ public class Juego extends InterfaceJuego {
 
 		// Inicializar lo que haga falta para el juego
 		this.rand = new Random();
-		this.pisos = crearPisos(4, 575);
+		
 		// Tener en cuenta que la dimensión de la imagen afecta como se ve en pantalla,
 		// por eso los 300px de más en el objeto lava
-		this.lava = new Lava(400, 875); // 575 + 300
+		this.fondo = new Fondo(400, 300);
+		this.pisos = crearPisos(4, 575);
 		this.personaje = new Personaje(400, 505, 2, false);
+		this.lava = new Lava(400, 875, 0.1); // 575 + 300
 
 		// Inicia el juego!
 		this.entorno.iniciar();
@@ -33,10 +37,11 @@ public class Juego extends InterfaceJuego {
 	@Override
 	public void tick() {
 		// Procesamiento de un instante de tiempo
+		this.fondo.dibujar(entorno);
 		dibujarPisos();
 		dibujarPersonaje();
 		dibujarLava();
-
+		
 		ticks++;
 		System.out.println(ticks);
 	}
@@ -53,29 +58,30 @@ public class Juego extends InterfaceJuego {
 	private Piso[] crearPisos(int cant, double y) {
 		Piso[] pisos = new Piso[cant];
 		for (int i = 0; i < cant; i++) {
-			pisos[i] = crearPiso(y);
+			int tipoDeBloque = (i == 0) ? -1 : 0;
+			pisos[i] = crearPiso(y, tipoDeBloque);
 			y -= 150;
 		}
 		return pisos;
 	}
 
-	private Piso crearPiso(double y) {
-		return new Piso(crearBloques(y), crearEnemigos(y));
+	private Piso crearPiso(double y, int tipoDeBloque) {
+		return new Piso(crearBloques(y, tipoDeBloque), crearEnemigos(y));
 	}
 
-	private Bloque[] crearBloques(double y) {
+	private Bloque[] crearBloques(double y, int tipoDeBloque) {
 		int cant = 16;
 		double x = 25; // Posición inicial de x
 		Bloque[] bloques = new Bloque[cant];
 		for (int i = 0; i < cant; i++) {
-			bloques[i] = crearBloque(x, y, false);
+			bloques[i] = crearBloque(x, y, tipoDeBloque);
 			x += 50;
 		}
 		return bloques;
 	}
 
-	private Bloque crearBloque(double x, double y, boolean esPiedra) {
-		return new Bloque(x, y, esPiedra);
+	private Bloque crearBloque(double x, double y, int tipoDeBloque) {
+		return new Bloque(x, y, tipoDeBloque);
 	}
 
 	private Enemigo[] crearEnemigos(double y) {
@@ -111,11 +117,8 @@ public class Juego extends InterfaceJuego {
 	}
 
 	private void dibujarLava() {
-		int cantTicks = 6;
-		lava.dibujarse(entorno); // Dibujar lava
-		if (ticks % cantTicks == 0) {
-			lava.subir(entorno); // Sube la lava cada x ticks
-		}
+		lava.subir(entorno);
+		lava.dibujarse(entorno);
 	}
 
 	public static void main(String[] args) {
