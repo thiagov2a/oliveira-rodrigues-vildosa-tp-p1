@@ -7,47 +7,70 @@ import entorno.Herramientas;
 
 public class Personaje {
 
+	// Imágenes estáticas para todos los enemigos, para optimizar recursos.
+	private static final Image IZQ = Herramientas.cargarImagen("personaje-izq.png");
+	private static final Image DER = Herramientas.cargarImagen("personaje-der.png");
+
 	private double x;
 	private double y;
-	private Image img;
+	double velocidad;
+	// Dirección actual del enemigo (false indica hacia la derecha).
+	boolean direccion;
 
 	public Personaje() {
 	}
 
-	public Personaje(double x, double y) {
+	public Personaje(double x, double y, double velocidad, boolean direccion) {
 		this.x = x;
 		this.y = y;
-		this.img = Herramientas.cargarImagen("personaje.png");
+		this.velocidad = velocidad;
+		this.direccion = direccion;
 	}
 
-	public void dibujarse(Entorno entorno) {
-		entorno.dibujarImagen(this.img, this.x, this.y, 0);
+	public void dibujar(Entorno entorno) {
+		Image img = direccion ? IZQ : DER;
+		entorno.dibujarImagen(img, this.x, this.y, 0);
 	}
 
-	public void moverDerecha(Entorno entorno) {
-		this.img = Herramientas.cargarImagen("personaje.png");
-		if (this.x <= 787.5) {
-			this.x += 2; // Velocidad
-			entorno.dibujarImagen(this.img, this.x, this.y, 0);			
+	public void mover(Entorno entorno) {
+		this.x += this.direccion ? -this.velocidad : this.velocidad;
+
+		if (this.x > entorno.ancho() - this.getAncho() / 2) {
+			this.x = entorno.ancho() - this.getAncho() / 2;
+		}
+
+		if (this.x < this.getAncho() / 2) {
+			this.x = this.getAncho() / 2;
 		}
 	}
 
-	public void moverIzquierda(Entorno entorno) {
-		this.img = Herramientas.cargarImagen("personaje2.png");
-		if (this.x >= 12.5) {
-			this.x -= 2; // Velocidad
-			entorno.dibujarImagen(this.img, this.x, this.y, 0);			
-		}
-	}
-	
 	public double getAncho() {
-		return img.getWidth(null);
-	}
-	
-	public double getAlto() {
-		return img.getHeight(null);
+		return IZQ.getWidth(null);
 	}
 
+	public double getAlto() {
+		return IZQ.getHeight(null);
+	}
+
+	public double getTecho() {
+		return this.y - this.getAlto() / 2;
+
+	}
+
+	public double getPiso() {
+		return this.y + this.getAlto() / 2;
+	}
+
+	public double getIzquierda() {
+		return this.x - this.getAncho() / 2;
+
+	}
+
+	public double getDerecha() {
+		return this.x + this.getAncho() / 2;
+	}
+
+	// Getters & Setters
 	public double getX() {
 		return x;
 	}
@@ -64,12 +87,28 @@ public class Personaje {
 		this.y = y;
 	}
 
-	public Image getImg() {
-		return img;
+	public double getVelocidad() {
+		return velocidad;
 	}
 
-	public void setImg(Image img) {
-		this.img = img;
+	public void setVelocidad(double velocidad) {
+		this.velocidad = velocidad;
+	}
+
+	public boolean isDireccion() {
+		return direccion;
+	}
+
+	public void setDireccion(boolean direccion) {
+		this.direccion = direccion;
+	}
+
+	public static Image getIzq() {
+		return IZQ;
+	}
+
+	public static Image getDer() {
+		return DER;
 	}
 
 }
