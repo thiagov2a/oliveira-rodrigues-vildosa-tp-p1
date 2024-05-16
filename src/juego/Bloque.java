@@ -9,8 +9,8 @@ public class Bloque {
 
 	// Imágenes estáticas para todos los enemigos, para optimizar recursos.
 	private static final Image BEDROCK = Herramientas.cargarImagen("bedrock.png");
-	private static final Image TIERRA = Herramientas.cargarImagen("piedra.png");
-	private static final Image PIEDRA = Herramientas.cargarImagen("tierra.png");
+	private static final Image TIERRA = Herramientas.cargarImagen("tierra.png");
+	private static final Image PIEDRA = Herramientas.cargarImagen("piedra.png");
 
 	private double x;
 	private double y;

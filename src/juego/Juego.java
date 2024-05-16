@@ -13,7 +13,7 @@ public class Juego extends InterfaceJuego {
 	private Piso[] pisos;
 	private Personaje personaje;
 	private Lava lava;
-	
+
 	private int ticks;
 
 	public Juego() {
@@ -22,7 +22,7 @@ public class Juego extends InterfaceJuego {
 
 		// Inicializar lo que haga falta para el juego
 		this.rand = new Random();
-		
+
 		// Tener en cuenta que la dimensión de la imagen afecta como se ve en pantalla,
 		// por eso los 300px de más en el objeto lava
 		this.fondo = new Fondo(400, 300);
@@ -41,7 +41,7 @@ public class Juego extends InterfaceJuego {
 		dibujarPisos();
 		dibujarPersonaje();
 		dibujarLava();
-		
+
 		ticks++;
 		System.out.println(ticks);
 	}
