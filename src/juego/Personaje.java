@@ -7,14 +7,14 @@ import entorno.Herramientas;
 
 public class Personaje {
 
-	// Imágenes estáticas para todos los enemigos, para optimizar recursos.
+	// Imágenes estáticas del personaje, para optimizar recursos.
 	private static final Image IZQ = Herramientas.cargarImagen("personaje-izq.png");
 	private static final Image DER = Herramientas.cargarImagen("personaje-der.png");
 
 	private double x;
 	private double y;
 	double velocidad;
-	// Dirección actual del enemigo (false indica hacia la derecha).
+	// Dirección actual del personaje (false indica hacia la derecha).
 	boolean direccion;
 
 	public Personaje() {
@@ -108,5 +108,4 @@ public class Personaje {
 	public static Image getDer() {
 		return DER;
 	}
-
 }

@@ -5,101 +5,74 @@ import entorno.Entorno;
 import entorno.InterfaceJuego;
 
 public class Juego extends InterfaceJuego {
-	// El objeto Entorno que controla el tiempo y otros
+
 	private Entorno entorno;
-	// Variables propias
 	private Random rand;
 	private Fondo fondo;
 	private Piso[] pisos;
+	private Enemigo[] enemigos; // Un solo arreglo de enemigos
 	private Personaje personaje;
 	private Lava lava;
-
 	private int ticks;
 
 	public Juego() {
-		// Inicializa el objeto entorno
 		this.entorno = new Entorno(this, "Super Elizabeth Sis, Volcano Edition - Grupo 3", 800, 600);
-
-		// Inicializar lo que haga falta para el juego
-		this.rand = new Random();
-
-		// Tener en cuenta que la dimensión de la imagen afecta como se ve en pantalla,
-		// por eso los 300px de más en el objeto lava
-		this.fondo = new Fondo(400, 300);
-		this.pisos = crearPisos(4, 575);
-		this.personaje = new Personaje(400, 505, 2, false);
-		this.lava = new Lava(400, 875, 0.1); // 575 + 300
-
-		// Inicia el juego!
+		inicializarJuego();
 		this.entorno.iniciar();
+	}
+
+	private void inicializarJuego() {
+		this.rand = new Random();
+		this.fondo = new Fondo(400, 300);
+		int cantidadPisos = 4;
+		this.pisos = new Piso[cantidadPisos];
+		int cantidadEnemigos = cantidadPisos * 2; // Dos enemigos por piso
+		this.enemigos = new Enemigo[cantidadEnemigos];
+		crearPisosYEnemigos(cantidadPisos, 575);
+		this.personaje = new Personaje(400, 505, 3, false);
+		this.lava = new Lava(400, 875, 0.1);
+	}
+
+	private void crearPisosYEnemigos(int cantidadPisos, double yInicial) {
+		for (int i = 0; i < cantidadPisos; i++) {
+			boolean esPrimerPiso = (i == 0);
+			this.pisos[i] = new Piso(yInicial, esPrimerPiso);
+
+			for (int j = 0; j < 2; j++) { // Crear dos enemigos por piso
+				double x = rand.nextDouble(50, 750);
+				boolean direccion = rand.nextBoolean();
+				this.enemigos[i * 2 + j] = new Enemigo(x, yInicial - 70, 4, direccion);
+			}
+			yInicial -= 150;
+		}
 	}
 
 	@Override
 	public void tick() {
-		// Procesamiento de un instante de tiempo
-		this.fondo.dibujar(entorno);
-		dibujarPisos();
-		dibujarPersonaje();
-		dibujarLava();
-
+		renderizarJuego();
 		ticks++;
 		System.out.println(ticks);
 	}
 
-	// Métodos propios
-	// Dibujar pisos en pantalla
+	private void renderizarJuego() {
+		this.fondo.dibujar(entorno);
+		dibujarPisos();
+		dibujarEnemigos();
+		dibujarPersonaje();
+		dibujarLava();
+	}
+
 	private void dibujarPisos() {
 		for (Piso piso : pisos) {
 			piso.dibujarPiso(entorno);
 		}
 	}
 
-	// Generación de pisos de manera automática
-	private Piso[] crearPisos(int cant, double y) {
-		Piso[] pisos = new Piso[cant];
-		for (int i = 0; i < cant; i++) {
-			int tipoDeBloque = (i == 0) ? -1 : 0;
-			pisos[i] = crearPiso(y, tipoDeBloque);
-			y -= 150;
+	private void dibujarEnemigos() {
+		for (Enemigo enemigo : enemigos) {
+			enemigo.mover(entorno);
+			enemigo.dibujar(entorno);
 		}
-		return pisos;
-	}
-
-	private Piso crearPiso(double y, int tipoDeBloque) {
-		return new Piso(crearBloques(y, tipoDeBloque), crearEnemigos(y));
-	}
-
-	private Bloque[] crearBloques(double y, int tipoDeBloque) {
-		int cant = 16;
-		double x = 25; // Posición inicial de x
-		Bloque[] bloques = new Bloque[cant];
-		for (int i = 0; i < cant; i++) {
-			bloques[i] = crearBloque(x, y, tipoDeBloque);
-			x += 50;
-		}
-		return bloques;
-	}
-
-	private Bloque crearBloque(double x, double y, int tipoDeBloque) {
-		return new Bloque(x, y, tipoDeBloque);
-	}
-
-	private Enemigo[] crearEnemigos(double y) {
-		y -= 70;
-		int cant = 2;
-		Enemigo[] enemigos = new Enemigo[cant];
-
-		for (int i = 0; i < cant; i++) {
-			double x = (i == 0) ? rand.nextDouble(12.5, 300) : rand.nextDouble(500, 787.5);
-			boolean direccion = (i == 0) ? true : false;
-			enemigos[i] = crearEnemigo(x, y, direccion);
-		}
-
-		return enemigos;
-	}
-
-	private Enemigo crearEnemigo(double x, double y, boolean direccion) {
-		return new Enemigo(x, y, 4, direccion);
 	}
 
 	private void dibujarPersonaje() {
@@ -124,5 +97,4 @@ public class Juego extends InterfaceJuego {
 	public static void main(String[] args) {
 		new Juego();
 	}
-
 }
