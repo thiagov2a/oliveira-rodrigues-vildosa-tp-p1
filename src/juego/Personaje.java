@@ -1,6 +1,7 @@
 package juego;
 
 import java.awt.Image;
+import java.util.Random;
 
 import entorno.Entorno;
 import entorno.Herramientas;
@@ -11,37 +12,69 @@ public class Personaje {
 	private static final Image IZQ = Herramientas.cargarImagen("personaje-izq.png");
 	private static final Image DER = Herramientas.cargarImagen("personaje-der.png");
 
+	private static final Random rand = new Random();
+
 	private double x;
 	private double y;
-	double velocidad;
+	private double velocidad;
 	// Dirección actual del personaje (false indica hacia la derecha).
-	boolean direccion;
+	private boolean direccion;
+	private boolean apoyado;
+	private boolean cayendo;
+	private boolean saltando;
+	private int contadorSalto;
 
 	public Personaje() {
 	}
 
-	public Personaje(double x, double y, double velocidad, boolean direccion) {
+	public Personaje(double x, double y) {
 		this.x = x;
 		this.y = y;
-		this.velocidad = velocidad;
-		this.direccion = direccion;
+		this.velocidad = 2.5;
+		this.direccion = rand.nextBoolean();
+		this.apoyado = false;
+		this.cayendo = false;
+		this.saltando = false;
+		this.contadorSalto = 0;
 	}
 
 	public void dibujar(Entorno entorno) {
-		Image img = direccion ? IZQ : DER;
+		Image img = this.direccion ? IZQ : DER;
 		entorno.dibujarImagen(img, this.x, this.y, 0);
 	}
 
 	public void mover(Entorno entorno) {
-		// Actualiza la posición basada en la dirección.
-		this.x += this.direccion ? -this.velocidad : this.velocidad;
+		double bordeIzq = this.getAncho() / 2;
+		double bordeDer = entorno.ancho() - this.getAncho() / 2;
 
-		// Asegura que el personaje no salga del entorno visual.
-		if (this.x > entorno.ancho() - this.getAncho() / 2) {
-			this.x = entorno.ancho() - this.getAncho() / 2;
-		} else if (this.x < this.getAncho() / 2) {
-			this.x = this.getAncho() / 2;
+		// Mueve el personaje hacia la izquierda o la derecha según su dirección.
+		if (this.direccion && this.x >= bordeIzq) {
+			this.x -= this.velocidad;
+		} else if (!this.direccion && this.x <= bordeDer) {
+			this.x += this.velocidad;
 		}
+	}
+
+	public void caerSubir() {
+		if (!this.apoyado && !this.saltando) {
+			this.cayendo = true;
+			this.y += 1.5;
+		} else {
+			this.cayendo = false;
+		}
+
+		if (this.saltando) {
+			this.cayendo = false;
+			this.y -= 7.5;
+			this.contadorSalto++;
+		}
+
+		if (this.contadorSalto > 20) {
+			this.cayendo = true;
+			this.saltando = false;
+			this.contadorSalto = 0;
+		}
+
 	}
 
 	public double getAncho() {
@@ -69,6 +102,7 @@ public class Personaje {
 	}
 
 	// Getters & Setters
+
 	public double getX() {
 		return x;
 	}
@@ -101,11 +135,35 @@ public class Personaje {
 		this.direccion = direccion;
 	}
 
-	public static Image getIzq() {
-		return IZQ;
+	public boolean isApoyado() {
+		return apoyado;
 	}
 
-	public static Image getDer() {
-		return DER;
+	public void setApoyado(boolean apoyado) {
+		this.apoyado = apoyado;
+	}
+
+	public boolean isCayendo() {
+		return cayendo;
+	}
+
+	public void setCayendo(boolean cayendo) {
+		this.cayendo = cayendo;
+	}
+
+	public boolean isSaltando() {
+		return saltando;
+	}
+
+	public void setSaltando(boolean saltando) {
+		this.saltando = saltando;
+	}
+
+	public int getContadorSalto() {
+		return contadorSalto;
+	}
+
+	public void setContadorSalto(int contadorSalto) {
+		this.contadorSalto = contadorSalto;
 	}
 }

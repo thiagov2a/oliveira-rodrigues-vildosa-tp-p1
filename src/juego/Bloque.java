@@ -38,7 +38,32 @@ public class Bloque {
 		}
 	}
 
+	public double getAlto() {
+		return BEDROCK.getHeight(null);
+	}
+
+	public double getAncho() {
+		return BEDROCK.getWidth(null);
+	}
+
+	public double getIzquierda() {
+		return this.x - this.getAncho() / 2;
+	}
+
+	public double getDerecha() {
+		return this.x + this.getAncho() / 2;
+	}
+
+	public double getTecho() {
+		return this.y - this.getAlto() / 2;
+	}
+
+	public double getPiso() {
+		return this.y + this.getAlto() / 2;
+	}
+
 	// Getter & Setters
+
 	public double getX() {
 		return x;
 	}
@@ -62,4 +87,5 @@ public class Bloque {
 	public void setTipo(int tipo) {
 		this.tipo = tipo;
 	}
+
 }

@@ -15,7 +15,9 @@ public class Piso {
 
 	public void dibujarPiso(Entorno entorno) {
 		for (Bloque bloque : bloques) {
-			bloque.dibujarse(entorno);
+			if (bloque != null) {
+				bloque.dibujarse(entorno);				
+			}
 		}
 	}
 
@@ -29,7 +31,7 @@ public class Piso {
 			if (esPrimerPiso) {
 				tipoDeBloque = -1;
 			} else {
-				tipoDeBloque = rand.nextInt(10) < 3 ? 1 : 0; // 30% de probabilidad para el tipo 1
+				tipoDeBloque = rand.nextInt(10) < 4 ? 1 : 0; // 40% de probabilidad para el tipo 1
 			}
 			bloques[i] = new Bloque(x, y, tipoDeBloque);
 			x += 50;

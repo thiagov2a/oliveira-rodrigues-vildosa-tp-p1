@@ -1,6 +1,8 @@
 package juego;
 
 import java.awt.Image;
+import java.util.Random;
+
 import entorno.Entorno;
 import entorno.Herramientas;
 
@@ -10,35 +12,46 @@ public class Enemigo {
 	private static final Image IZQ = Herramientas.cargarImagen("enemigo-izq.png");
 	private static final Image DER = Herramientas.cargarImagen("enemigo-der.png");
 
+	private static final Random rand = new Random();
+
 	private double x;
 	private double y;
 	private double velocidad;
 	// Dirección actual del enemigo (false indica hacia la derecha).
 	private boolean direccion;
+	private boolean apoyado;
 
-	public Enemigo(double x, double y, double velocidad, boolean direccion) {
+	public Enemigo(double x, double y) {
 		this.x = x;
 		this.y = y;
-		this.velocidad = velocidad;
-		this.direccion = direccion;
+		this.velocidad = 2;
+		this.direccion = rand.nextBoolean();
 	}
 
 	public void dibujar(Entorno entorno) {
-		Image img = direccion ? IZQ : DER;
+		Image img = this.direccion ? IZQ : DER;
 		entorno.dibujarImagen(img, this.x, this.y, 0);
 	}
 
 	public void mover(Entorno entorno) {
-		double bordeIzq = getAncho() / 2;
-		double bordeDer = entorno.ancho() - getAncho() / 2;
+		double bordeIzq = this.getAncho() / 2;
+		double bordeDer = entorno.ancho() - this.getAncho() / 2;
 
-		// Mueve al enemigo hacia la izquierda o la derecha según su dirección.
-		if (direccion && this.x >= bordeIzq) {
-			this.x -= this.velocidad;
-		} else if (!direccion && this.x <= bordeDer) {
-			this.x += this.velocidad;
-		} else {
-			direccion = !direccion; // Cambia la dirección si se alcanza cualquiera de los límites
+		if (this.apoyado) {
+			// Mueve al enemigo hacia la izquierda o la derecha según su dirección.
+			if (this.direccion && this.x >= bordeIzq) {
+				this.x -= this.velocidad;
+			} else if (!this.direccion && this.x <= bordeDer) {
+				this.x += this.velocidad;
+			} else {
+				this.direccion = !this.direccion; // Cambia la dirección si se alcanza cualquiera de los bordes.
+			}
+		}
+	}
+
+	public void caer() {
+		if (!this.apoyado) {
+			this.y += 1.5;
 		}
 	}
 
@@ -99,12 +112,11 @@ public class Enemigo {
 		this.direccion = direccion;
 	}
 
-	public static Image getIzq() {
-		return IZQ;
+	public boolean isApoyado() {
+		return apoyado;
 	}
 
-	public static Image getDer() {
-		return DER;
+	public void setApoyado(boolean apoyado) {
+		this.apoyado = apoyado;
 	}
-
 }
