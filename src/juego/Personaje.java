@@ -23,6 +23,7 @@ public class Personaje {
 	private boolean cayendo;
 	private boolean saltando;
 	private int contadorSalto;
+	private Proyectil proyectil;
 
 	public Personaje() {
 	}
@@ -40,41 +41,49 @@ public class Personaje {
 
 	public void dibujar(Entorno entorno) {
 		Image img = this.direccion ? IZQ : DER;
-		entorno.dibujarImagen(img, this.x, this.y, 0);
+		entorno.dibujarImagen(img, this.x, this.y, 0.0);
 	}
 
 	public void mover(Entorno entorno) {
-		double bordeIzq = this.getAncho() / 2;
-		double bordeDer = entorno.ancho() - this.getAncho() / 2;
+		double limiteIzq = this.getAncho() / 2;
+		double limiteDer = entorno.ancho() - this.getAncho() / 2;
 
 		// Mueve el personaje hacia la izquierda o la derecha según su dirección.
-		if (this.direccion && this.x >= bordeIzq) {
+		if (this.direccion && this.x >= limiteIzq) {
 			this.x -= this.velocidad;
-		} else if (!this.direccion && this.x <= bordeDer) {
+		} else if (!this.direccion && this.x <= limiteDer) {
 			this.x += this.velocidad;
 		}
 	}
 
 	public void caerSubir() {
+		// Si no está apoyado y no está saltando, entonces está cayendo
 		if (!this.apoyado && !this.saltando) {
 			this.cayendo = true;
-			this.y += 1.5;
+			this.y += 3.0;
 		} else {
 			this.cayendo = false;
 		}
 
+		// Si está saltando
 		if (this.saltando) {
 			this.cayendo = false;
-			this.y -= 7.5;
+			this.y -= 7.0;
 			this.contadorSalto++;
 		}
 
-		if (this.contadorSalto > 20) {
+		// Si el contador de salto supera un límite, el salto termina y empieza a caer
+		if (this.contadorSalto > 21) {
 			this.cayendo = true;
 			this.saltando = false;
 			this.contadorSalto = 0;
 		}
 
+		// Restablecer contador y velocidad de caída al aterrizar
+		if (this.cayendo && this.apoyado) {
+			this.cayendo = false;
+			this.contadorSalto = 0;
+		}
 	}
 
 	public double getAncho() {

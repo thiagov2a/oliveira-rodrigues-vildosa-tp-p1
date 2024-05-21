@@ -23,14 +23,13 @@ public class Juego extends InterfaceJuego {
 
 	private void inicializarJuego() {
 		this.rand = new Random();
-		this.fondo = new Fondo(400, 300);
+		this.fondo = new Fondo(400.0, 301.0);
 
 		int cantidadPisos = 4;
-
-		this.pisos = crearPisos(cantidadPisos, 575);
-		this.enemigos = crearEnemigos(cantidadPisos, 500);
-		this.personaje = new Personaje(400, 500);
-		this.lava = new Lava(400, 875, 0.1);
+		this.pisos = crearPisos(cantidadPisos, 575.0);
+		this.enemigos = crearEnemigos(cantidadPisos, 500.0);
+		this.personaje = new Personaje(400.0, 500.0);
+		this.lava = new Lava(400.0, 875.0);
 	}
 
 	private Piso[] crearPisos(int cantidadPisos, double yInicial) {
@@ -38,22 +37,22 @@ public class Juego extends InterfaceJuego {
 		for (int i = 0; i < cantidadPisos; i++) {
 			boolean esPrimerPiso = (i == 0);
 			pisos[i] = new Piso(yInicial, esPrimerPiso);
-			yInicial -= 150; // Cambiar y para el próximo piso
+			yInicial -= 150.0; // Cambiar y para el próximo piso
 		}
 		return pisos;
 	}
 
 	private Enemigo[] crearEnemigos(int cantidadPisos, double yInicial) {
 		Enemigo[] enemigos = new Enemigo[cantidadPisos * 2];
-		int enemigoIndex = 0;
+		int indice = 0;
 
 		for (int i = 0; i < cantidadPisos; i++) {
 			for (int j = 0; j < 2; j++) { // Crear dos enemigos por piso
 				boolean esPrimerEnemigo = (j == 0);
-				double x = esPrimerEnemigo ? rand.nextDouble(50, 300) : rand.nextDouble(500, 750);
-				enemigos[enemigoIndex++] = new Enemigo(x, yInicial);
+				double x = esPrimerEnemigo ? rand.nextDouble(50.0, 300.0) : rand.nextDouble(500.0, 750.0);
+				enemigos[indice++] = new Enemigo(x, yInicial);
 			}
-			yInicial -= 150; // Cambiar y para el próximo piso
+			yInicial -= 150.0; // Cambiar y para el próximo piso
 		}
 		return enemigos;
 	}
@@ -75,7 +74,9 @@ public class Juego extends InterfaceJuego {
 
 	private void dibujarPisos() {
 		for (Piso piso : pisos) {
-			piso.dibujarPiso(entorno);
+			if (piso != null) {
+				piso.dibujarPiso(entorno);
+			}
 		}
 	}
 
@@ -83,7 +84,7 @@ public class Juego extends InterfaceJuego {
 		for (Enemigo enemigo : enemigos) {
 			if (enemigo != null) {
 				enemigo.mover(entorno);
-				enemigo.caer();
+				enemigo.caerDisparar(entorno);
 				enemigo.setApoyado(detectarApoyo(enemigo, pisos));
 				enemigo.dibujar(entorno);
 			}
@@ -91,11 +92,9 @@ public class Juego extends InterfaceJuego {
 	}
 
 	public boolean detectarApoyo(Enemigo enemigo, Piso[] pisos) {
-		if (enemigo != null) {
-			for (Piso piso : pisos) {
-				if (detectarApoyo(enemigo, piso)) {
-					return true;
-				}
+		for (Piso piso : pisos) {
+			if (piso != null && detectarApoyo(enemigo, piso)) {
+				return true;
 			}
 		}
 		return false;
@@ -119,35 +118,36 @@ public class Juego extends InterfaceJuego {
 	}
 
 	private void dibujarPersonaje() {
+		if (this.personaje != null) {
+			if (entorno.estaPresionada(entorno.TECLA_DERECHA)) {
+				personaje.setDireccion(false);
+				personaje.mover(entorno);
+			}
 
-		if (entorno.estaPresionada(entorno.TECLA_DERECHA)) {
-			personaje.setDireccion(false);
-			personaje.mover(entorno);
+			if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)) {
+				personaje.setDireccion(true);
+				personaje.mover(entorno);
+			}
+
+			if (entorno.sePresiono('x') && !personaje.isSaltando() && !personaje.isCayendo()) {
+				personaje.setSaltando(true);
+			}
+
+			personaje.caerSubir();
+			personaje.setApoyado(detectarApoyo(personaje, pisos));
+
+			if (detectarColision(personaje, pisos)) {
+				personaje.setSaltando(false);
+				personaje.setContadorSalto(0);
+			}
+
+			personaje.dibujar(entorno);
 		}
-
-		if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)) {
-			personaje.setDireccion(true);
-			personaje.mover(entorno);
-		}
-
-		if (entorno.sePresiono('x') && !personaje.isSaltando() && !personaje.isCayendo()) {
-			personaje.setSaltando(true);
-		}
-
-		personaje.caerSubir();
-		personaje.setApoyado(detectarApoyo(personaje, pisos));
-
-		if (detectarColision(personaje, pisos)) {
-			personaje.setSaltando(false);
-			personaje.setContadorSalto(0);
-		}
-
-		personaje.dibujar(entorno);
 	}
 
 	public boolean detectarApoyo(Personaje personaje, Piso[] pisos) {
 		for (Piso piso : pisos) {
-			if (detectarApoyo(personaje, piso)) {
+			if (piso != null && detectarApoyo(personaje, piso)) {
 				return true;
 			}
 		}
@@ -155,9 +155,11 @@ public class Juego extends InterfaceJuego {
 	}
 
 	private boolean detectarApoyo(Personaje personaje, Piso piso) {
-		for (Bloque bloque : piso.getBloques()) {
-			if (bloque != null && detectarApoyo(personaje, bloque)) {
-				return true;
+		if (personaje != null) {
+			for (Bloque bloque : piso.getBloques()) {
+				if (bloque != null && detectarApoyo(personaje, bloque)) {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -173,7 +175,7 @@ public class Juego extends InterfaceJuego {
 
 	public boolean detectarColision(Personaje personaje, Piso[] pisos) {
 		for (Piso piso : pisos) {
-			if (detectarColision(personaje, piso)) {
+			if (piso != null && detectarColision(personaje, piso)) {
 				return true;
 			}
 		}

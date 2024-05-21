@@ -12,18 +12,18 @@ public class Lava {
 	private double x;
 	private double y;
 	private double velocidad;
-	
+
 	public Lava() {
 	}
 
-	public Lava(double x, double y, double velocidad) {
+	public Lava(double x, double y) {
 		this.x = x;
 		this.y = y;
-		this.velocidad = velocidad;
+		this.velocidad = 0.1;
 	}
 
 	public void dibujarse(Entorno entorno) {
-		entorno.dibujarImagen(GIF, this.x, this.y, 0);
+		entorno.dibujarImagen(GIF, this.x, this.y, 0.0);
 	}
 
 	public void subir(Entorno entorno) {
@@ -40,7 +40,5 @@ public class Lava {
 	public double getAlto() {
 		return GIF.getHeight(null);
 	}
-
-	
 
 }

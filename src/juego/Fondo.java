@@ -21,7 +21,7 @@ public class Fondo {
 	}
 	
 	public void dibujar(Entorno entorno) {
-		entorno.dibujarImagen(IMG, x, y, 0);
+		entorno.dibujarImagen(IMG, x, y, 0.0);
 	}
 	
 	public double getAncho() {

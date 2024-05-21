@@ -23,7 +23,7 @@ public class Piso {
 
 	private Bloque[] crearBloques(double y, boolean esPrimerPiso) {
 		int cantidad = 16;
-		double x = 25;
+		double x = 25.0;
 		Bloque[] bloques = new Bloque[cantidad];
 
 		for (int i = 0; i < cantidad; i++) {
@@ -34,7 +34,7 @@ public class Piso {
 				tipoDeBloque = rand.nextInt(10) < 4 ? 1 : 0; // 40% de probabilidad para el tipo 1
 			}
 			bloques[i] = new Bloque(x, y, tipoDeBloque);
-			x += 50;
+			x += 50.0;
 		}
 
 		// Asegurarse de que hay al menos un bloque destructible si no es el primer piso

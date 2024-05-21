@@ -24,7 +24,7 @@ public class Bloque {
 
 	public void dibujarse(Entorno entorno) {
 		Image img = seleccionarImagen();
-		entorno.dibujarImagen(img, this.x, this.y, 0);
+		entorno.dibujarImagen(img, this.x, this.y, 0.0);
 	}
 
 	private Image seleccionarImagen() {
