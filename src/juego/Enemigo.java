@@ -41,7 +41,7 @@ public class Enemigo {
 		this.velocidad = 2.0;
 		this.direccion = rand.nextBoolean();
 		this.disparando = false;
-		this.contadorDisparo = 0;
+		this.contadorDisparo = rand.nextInt(0, 20);
 		this.estadoDisparo = 0;
 		this.proyectil = null;
 	}

@@ -54,7 +54,7 @@ public class Proyectil {
 		} else if (!this.direccion && this.x <= limiteDer) {
 			this.x += this.velocidad;
 		} else {
-			baja = true; // Da de baja el proyectil en caso de llegar a los bordes.
+			this.baja = true; // Da de baja el proyectil en caso de llegar a los bordes.
 		}
 	}
 

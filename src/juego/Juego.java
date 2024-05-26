@@ -29,7 +29,7 @@ public class Juego extends InterfaceJuego {
 		this.pisos = crearPisos(cantidadPisos, 575.0);
 		this.enemigos = crearEnemigos(cantidadPisos, 500.0);
 		this.personaje = new Personaje(400.0, 500.0);
-		this.lava = new Lava(400.0, 875.0);
+		this.lava = new Lava(400.0, 900.0);
 	}
 
 	private Piso[] crearPisos(int cantidadPisos, double yInicial) {
@@ -83,9 +83,9 @@ public class Juego extends InterfaceJuego {
 	private void dibujarEnemigos() {
 		for (Enemigo enemigo : enemigos) {
 			if (enemigo != null) {
+				enemigo.setApoyado(detectarApoyo(enemigo, pisos));
 				enemigo.mover(entorno);
 				enemigo.caerDisparar(entorno);
-				enemigo.setApoyado(detectarApoyo(enemigo, pisos));
 				enemigo.dibujar(entorno);
 			}
 		}
@@ -110,7 +110,7 @@ public class Juego extends InterfaceJuego {
 	}
 
 	private boolean detectarApoyo(Enemigo enemigo, Bloque bloque) {
-		boolean estaSobreBloque = Math.abs(enemigo.getPiso() - bloque.getTecho()) < 2;
+		boolean estaSobreBloque = Math.abs(enemigo.getPiso() - bloque.getTecho()) < 3;
 		boolean estaEntreLadosBloque = enemigo.getDerecha() > bloque.getIzquierda()
 				&& enemigo.getIzquierda() < bloque.getDerecha();
 
@@ -119,14 +119,23 @@ public class Juego extends InterfaceJuego {
 
 	private void dibujarPersonaje() {
 		if (this.personaje != null) {
-			if (entorno.estaPresionada(entorno.TECLA_DERECHA)) {
-				personaje.setDireccion(false);
-				personaje.mover(entorno);
+			personaje.setApoyado(detectarApoyo(personaje, pisos));
+
+			if (detectarColision(personaje, pisos)) {
+				personaje.setSaltando(false);
+				personaje.setContadorSalto(0);
 			}
 
-			if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)) {
-				personaje.setDireccion(true);
-				personaje.mover(entorno);
+			if (!detectarLados(personaje, pisos)) {
+				if (entorno.estaPresionada(entorno.TECLA_DERECHA)) {
+					personaje.setDireccion(false);
+					personaje.mover(entorno);
+				}
+
+				if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)) {
+					personaje.setDireccion(true);
+					personaje.mover(entorno);
+				}
 			}
 
 			if (entorno.sePresiono('x') && !personaje.isSaltando() && !personaje.isCayendo()) {
@@ -134,12 +143,6 @@ public class Juego extends InterfaceJuego {
 			}
 
 			personaje.caerSubir();
-			personaje.setApoyado(detectarApoyo(personaje, pisos));
-
-			if (detectarColision(personaje, pisos)) {
-				personaje.setSaltando(false);
-				personaje.setContadorSalto(0);
-			}
 
 			personaje.dibujar(entorno);
 		}
@@ -166,11 +169,41 @@ public class Juego extends InterfaceJuego {
 	}
 
 	private boolean detectarApoyo(Personaje personaje, Bloque bloque) {
-		boolean estaDebajoBloque = Math.abs(personaje.getPiso() - bloque.getTecho()) < 2;
+		boolean estaDebajoBloque = Math.abs(personaje.getPiso() - bloque.getTecho()) < 3;
 		boolean estaEntreLadosBloque = personaje.getDerecha() > bloque.getIzquierda()
 				&& personaje.getIzquierda() < bloque.getDerecha();
 
 		return estaDebajoBloque && estaEntreLadosBloque;
+	}
+
+	public boolean detectarLados(Personaje personaje, Piso[] pisos) {
+		for (Piso piso : pisos) {
+			if (piso != null && detectarLados(personaje, piso)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean detectarLados(Personaje personaje, Piso piso) {
+		if (personaje != null) {
+			for (Bloque bloque : piso.getBloques()) {
+				if (bloque != null && detectarLados(personaje, bloque)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	
+	// TODO: Refactorizar para lado izquierdo y derecho.
+	private boolean detectarLados(Personaje personaje, Bloque bloque) {
+		boolean estaEnMismaAltura = personaje.getPiso() > bloque.getTecho() && personaje.getTecho() < bloque.getPiso();
+		boolean estaEnAlgunBorde = Math.abs(personaje.getDerecha() - bloque.getIzquierda()) < 2
+				|| Math.abs(personaje.getIzquierda() - bloque.getDerecha()) < 2;
+
+		return estaEnMismaAltura && estaEnAlgunBorde;
 	}
 
 	public boolean detectarColision(Personaje personaje, Piso[] pisos) {

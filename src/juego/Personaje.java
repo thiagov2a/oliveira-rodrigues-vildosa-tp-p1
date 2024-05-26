@@ -31,7 +31,7 @@ public class Personaje {
 	public Personaje(double x, double y) {
 		this.x = x;
 		this.y = y;
-		this.velocidad = 2.5;
+		this.velocidad = 3.5;
 		this.direccion = rand.nextBoolean();
 		this.apoyado = false;
 		this.cayendo = false;
@@ -49,9 +49,9 @@ public class Personaje {
 		double limiteDer = entorno.ancho() - this.getAncho() / 2;
 
 		// Mueve el personaje hacia la izquierda o la derecha según su dirección.
-		if (this.direccion && this.x >= limiteIzq) {
+		if (this.direccion && this.x > limiteIzq) {
 			this.x -= this.velocidad;
-		} else if (!this.direccion && this.x <= limiteDer) {
+		} else if (!this.direccion && this.x < limiteDer) {
 			this.x += this.velocidad;
 		}
 	}
