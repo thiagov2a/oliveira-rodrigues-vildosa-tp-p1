@@ -9,10 +9,8 @@ import entorno.Herramientas;
 public class Enemigo {
 
 	// Imágenes estáticas para todos los enemigos, para optimizar recursos.
-	// private static final Image IZQ =
-	// Herramientas.cargarImagen("enemigo-izq.png");
-	// private static final Image DER =
-	// Herramientas.cargarImagen("enemigo-der.png");
+	private static final Image IZQ = Herramientas.cargarImagen("enemigo-izq.png");
+	private static final Image DER = Herramientas.cargarImagen("enemigo-der.png");
 
 	private static final Image ARCO_IZQ = Herramientas.cargarImagen("enemigo-arco-izq.png");
 	private static final Image ARCO_DER = Herramientas.cargarImagen("enemigo-arco-der.png");
@@ -21,7 +19,7 @@ public class Enemigo {
 	private static final Image DISPARO_DER = Herramientas.cargarImagen("enemigo-disparo-der.png");
 
 	// Diferencia de píxeles entre la imagen de ARCO y DISPARO.
-	private static final double DIFERENCIA_PX = 4.5;
+	private static final double DIFERENCIA_PX = 9.0;
 	private static final Random rand = new Random();
 
 	private double x;
@@ -48,13 +46,17 @@ public class Enemigo {
 
 	public void dibujar(Entorno entorno) {
 		Image img = seleccionarImagen();
-		if (this.disparando && this.direccion) {
-			entorno.dibujarImagen(img, this.x - DIFERENCIA_PX, this.y, 0.0);
-		} else if (this.disparando && !this.direccion) {
-			entorno.dibujarImagen(img, this.x + DIFERENCIA_PX, this.y, 0.0);
+
+		if (this.estadoDisparo == 1 && this.disparando) {
+			if (this.direccion) {
+				entorno.dibujarImagen(img, this.x - DIFERENCIA_PX, this.y, 0.0);
+			} else {
+				entorno.dibujarImagen(img, this.x + DIFERENCIA_PX, this.y, 0.0);
+			}
 		} else {
 			entorno.dibujarImagen(img, this.x, this.y, 0.0);
 		}
+
 		dibujarProyectil(entorno);
 	}
 
@@ -68,21 +70,20 @@ public class Enemigo {
 
 	private void dibujarProyectil(Entorno entorno) {
 		if (this.proyectil != null) {
-			this.proyectil.setDireccion(this.direccion);
 			this.proyectil.disparar(entorno);
 			this.proyectil.dibujar(entorno);
 		}
 	}
 
 	public void mover(Entorno entorno) {
-		double limiteIzq = this.getAncho() / 2;
-		double limeteDer = entorno.ancho() - this.getAncho() / 2;
+		double limiteIZQ = this.getAncho() / 2;
+		double limiteDER = entorno.ancho() - this.getAncho() / 2;
 
 		if (this.apoyado) {
 			// Mueve al enemigo hacia la izquierda o la derecha según su dirección.
-			if (this.direccion && this.x >= limiteIzq) {
+			if (this.direccion && this.x >= limiteIZQ) {
 				this.x -= this.velocidad;
-			} else if (!this.direccion && this.x <= limeteDer) {
+			} else if (!this.direccion && this.x <= limiteDER) {
 				this.x += this.velocidad;
 			} else {
 				this.direccion = !this.direccion; // Cambia la dirección si se alcanza cualquiera de los bordes.
@@ -91,45 +92,56 @@ public class Enemigo {
 	}
 
 	public void caerDisparar(Entorno entorno) {
+		final double VELOCIDAD_CAIDA = 3.0;
+		final int INICIO_DISPARO = 0;
+		final int FINAL_DISPARO = 20;
+		final int LIMITE_DISPARO = 160;
 
+		// Si no está apoyado, cae
 		if (!this.apoyado) {
-			this.y += 3.0;
+			this.y += VELOCIDAD_CAIDA;
 		}
 
-		if (this.proyectil != null && proyectil.isBaja()) {
+		// Si el proyectil ha sido disparado y está dado de baja, eliminarlo
+		if (this.proyectil != null && this.proyectil.isBaja()) {
 			this.proyectil = null;
 		}
 
+		// Si está apoyado y no hay proyectil, puede comenzar a disparar
 		if (this.apoyado && this.proyectil == null) {
 			this.disparando = true;
 		}
 
+		// Manejo del disparo
 		if (this.disparando) {
-
-			if (this.contadorDisparo == 0) {
+			// Comienza el disparo
+			if (this.contadorDisparo == INICIO_DISPARO) {
 				this.estadoDisparo = 1;
 				this.proyectil = new Proyectil(this.x, this.y - this.getAlto() / 4.5, this.direccion, true);
 			}
 
-			if (this.contadorDisparo == 20) {
+			// Finaliza la animación de disparo
+			if (this.contadorDisparo == FINAL_DISPARO) {
 				this.estadoDisparo = 0;
 			}
 
+			// Incrementar el contador de disparo
 			this.contadorDisparo++;
-		}
 
-		if (this.contadorDisparo > 160) {
-			this.disparando = false;
-			this.contadorDisparo = 0;
+			// Finalizar el estado de disparo después del límite
+			if (this.contadorDisparo > LIMITE_DISPARO) {
+				this.disparando = false;
+				this.contadorDisparo = 0;
+			}
 		}
 	}
 
 	public double getAncho() {
-		return ARCO_IZQ.getWidth(null);
+		return IZQ.getWidth(null);
 	}
 
 	public double getAlto() {
-		return ARCO_IZQ.getHeight(null);
+		return IZQ.getHeight(null);
 	}
 
 	public double getTecho() {

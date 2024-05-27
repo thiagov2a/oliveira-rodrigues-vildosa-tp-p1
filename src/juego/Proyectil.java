@@ -10,8 +10,8 @@ public class Proyectil {
 	private final static Image FLECHA_IZQ = Herramientas.cargarImagen("flecha-izq.png");
 	private final static Image FLECHA_DER = Herramientas.cargarImagen("flecha-der.png");
 
-	private final static Image BOLA_IZQ = Herramientas.cargarImagen("flecha-izq.png");
-	private final static Image BOLA_DER = Herramientas.cargarImagen("flecha-der.png");
+	private final static Image TRIDENTE_IZQ = Herramientas.cargarImagen("tridente-izq.png");
+	private final static Image TRIDENTE_DER = Herramientas.cargarImagen("tridente-der.png");
 
 	private double x;
 	private double y;
@@ -40,13 +40,14 @@ public class Proyectil {
 		if (this.tipo) {
 			return this.direccion ? FLECHA_IZQ : FLECHA_DER;
 		} else {
-			return this.direccion ? BOLA_IZQ : BOLA_DER;
+			return this.direccion ? TRIDENTE_IZQ : TRIDENTE_DER;
 		}
 	}
 
 	public void disparar(Entorno entorno) {
-		double limiteIzq = this.getAncho() / 2;
-		double limiteDer = entorno.ancho() - this.getAncho() / 2;
+		Image img = this.tipo ? FLECHA_IZQ : TRIDENTE_IZQ;
+		double limiteIzq = this.getAncho(img) / 2;
+		double limiteDer = entorno.ancho() - this.getAncho(img) / 2;
 
 		// Mueve el proyectil hacia la izquierda o la derecha según su dirección.
 		if (this.direccion && this.x >= limiteIzq) {
@@ -58,28 +59,28 @@ public class Proyectil {
 		}
 	}
 
-	public double getAncho() {
-		return FLECHA_IZQ.getWidth(null);
+	public double getAncho(Image img) {
+		return img.getWidth(null);
 	}
 
-	public double getAlto() {
-		return FLECHA_IZQ.getHeight(null);
+	public double getAlto(Image img) {
+		return img.getHeight(null);
 	}
 
-	public double getTecho() {
-		return this.y - this.getAlto() / 2;
+	public double getTecho(Image img) {
+		return this.y - this.getAlto(img) / 2;
 	}
 
-	public double getPiso() {
-		return this.y + this.getAlto() / 2;
+	public double getPiso(Image img) {
+		return this.y + this.getAlto(img) / 2;
 	}
 
-	public double getIzquierda() {
-		return this.x - this.getAncho() / 2;
+	public double getIzquierda(Image img) {
+		return this.x - this.getAncho(img) / 2;
 	}
 
-	public double getDerecha() {
-		return this.x + this.getAncho() / 2;
+	public double getDerecha(Image img) {
+		return this.x + this.getAncho(img) / 2;
 	}
 
 	// Getters & Setter
