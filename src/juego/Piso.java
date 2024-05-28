@@ -31,7 +31,7 @@ public class Piso {
 			if (esPrimerPiso) {
 				tipoDeBloque = -1;
 			} else {
-				tipoDeBloque = rand.nextInt(10) < 5 ? 1 : 0; // 50% de probabilidad para el tipo 1
+				tipoDeBloque = rand.nextInt(10) < 4 ? 1 : 0; // 40% de probabilidad para el tipo 1
 			}
 			bloques[i] = new Bloque(x, y, tipoDeBloque);
 			x += 50.0;

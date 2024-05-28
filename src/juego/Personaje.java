@@ -9,14 +9,24 @@ import entorno.Herramientas;
 public class Personaje {
 
 	// Imágenes estáticas del personaje, para optimizar recursos.
+
 	private static final Image IZQ = Herramientas.cargarImagen("personaje-izq.png");
 	private static final Image DER = Herramientas.cargarImagen("personaje-der.png");
+
+	private static final Image ESCUDO_IZQ = Herramientas.cargarImagen("personaje-escudo-izq.png");
+	private static final Image ESCUDO_DER = Herramientas.cargarImagen("personaje-escudo-der.png");
 
 	private static final Image TRIDENTE_IZQ = Herramientas.cargarImagen("personaje-tridente-izq.png");
 	private static final Image TRIDENTE_DER = Herramientas.cargarImagen("personaje-tridente-der.png");
 
+	private static final Image TRIDENTE_ESCUDO_IZQ = Herramientas.cargarImagen("personaje-tridente-escudo-izq.png");
+	private static final Image TRIDENTE_ESCUDO_DER = Herramientas.cargarImagen("personaje-tridente-escudo-der.png");
+
 	private static final Image DISPARO_IZQ = Herramientas.cargarImagen("personaje-disparo-izq.png");
 	private static final Image DISPARO_DER = Herramientas.cargarImagen("personaje-disparo-der.png");
+
+	private static final Image HITBOX_IZQ = Herramientas.cargarImagen("personaje-hitbox-izq.png");
+	private static final Image HITBOX_DER = Herramientas.cargarImagen("personaje-hitbox-der.png");
 
 	private static final double DIFERENCIA_PX = 12.0;
 	private static final Random rand = new Random();
@@ -33,6 +43,9 @@ public class Personaje {
 	private boolean disparando;
 	private int contadorDisparo;
 	private int estadoDisparo;
+	private boolean escudando;
+	private int contadorEscudo;
+	private int estadoEscudo;
 	private Proyectil proyectil;
 
 	public Personaje() {
@@ -50,24 +63,19 @@ public class Personaje {
 		this.disparando = false;
 		this.contadorDisparo = 0;
 		this.estadoDisparo = 0;
+		this.escudando = false;
+		this.contadorEscudo = 0;
+		this.estadoEscudo = 0;
 		this.proyectil = null;
 	}
 
 	public void dibujar(Entorno entorno) {
 		Image img = seleccionarImagen();
 
-		if (this.estadoDisparo == 0) {
-			if (!this.disparando) {
-				if (this.direccion) {
-					entorno.dibujarImagen(img, this.x - DIFERENCIA_PX, this.y, 0.0);
-				} else {
-					entorno.dibujarImagen(img, this.x + DIFERENCIA_PX, this.y, 0.0);
-				}
-			} else {
-				entorno.dibujarImagen(img, this.x, this.y, 0.0);
-			}
+		if (this.direccion) {
+			entorno.dibujarImagen(img, this.x - DIFERENCIA_PX, this.y, 0.0);
 		} else {
-			entorno.dibujarImagen(img, this.x, this.y, 0.0);
+			entorno.dibujarImagen(img, this.x + DIFERENCIA_PX, this.y, 0.0);
 		}
 
 		dibujarProyectil(entorno);
@@ -83,9 +91,17 @@ public class Personaje {
 	private Image seleccionarImagen() {
 		if (this.estadoDisparo == 0) {
 			if (!this.disparando) {
-				return this.direccion ? TRIDENTE_IZQ : TRIDENTE_DER;
+				if (this.estadoEscudo == 0) {
+					return this.direccion ? TRIDENTE_IZQ : TRIDENTE_DER;
+				} else {
+					return this.direccion ? TRIDENTE_ESCUDO_IZQ : TRIDENTE_ESCUDO_DER;
+				}
 			} else {
-				return this.direccion ? IZQ : DER;
+				if (this.estadoEscudo == 0) {
+					return this.direccion ? IZQ : DER;
+				} else {
+					return this.direccion ? ESCUDO_IZQ : ESCUDO_DER;
+				}
 			}
 		} else {
 			return this.direccion ? DISPARO_IZQ : DISPARO_DER;
@@ -131,7 +147,7 @@ public class Personaje {
 	}
 
 	public void disparar() {
-		if (!this.disparando && this.proyectil == null) {
+		if (!this.disparando && this.estadoEscudo == 0 && this.proyectil == null) {
 			this.disparando = true;
 			this.contadorDisparo = 0; // Inicia el contador de disparo
 		}
@@ -171,12 +187,47 @@ public class Personaje {
 		}
 	}
 
+	public void escudar() {
+		if (!this.escudando && this.estadoDisparo == 0) {
+			this.escudando = true;
+			this.contadorEscudo = 0; // Inicia el contador de disparo
+		}
+	}
+
+	public void cargarEscudo() {
+		final int INICIO_ESCUDO = 0;
+		final int FINAL_ESCUDO = 20;
+		final int LIMITE_ESCUDO = 80;
+
+		// Manejo del disparo
+		if (this.escudando) {
+			// Comienza el disparo
+			if (this.contadorEscudo == INICIO_ESCUDO) {
+				this.estadoEscudo = 1;
+			}
+
+			// Finaliza la animación de disparo
+			if (this.contadorEscudo == FINAL_ESCUDO) {
+				this.estadoEscudo = 0;
+			}
+
+			// Incrementar el contador de disparo
+			this.contadorEscudo++;
+
+			// Finalizar el estado de disparo después del límite
+			if (this.contadorEscudo > LIMITE_ESCUDO) {
+				this.escudando = false;
+				this.contadorEscudo = 0;
+			}
+		}
+	}
+
 	public double getAncho() {
-		return IZQ.getWidth(null);
+		return HITBOX_IZQ.getWidth(null);
 	}
 
 	public double getAlto() {
-		return IZQ.getHeight(null);
+		return HITBOX_DER.getHeight(null);
 	}
 
 	public double getTecho() {
@@ -291,5 +342,29 @@ public class Personaje {
 
 	public void setProyectil(Proyectil proyectil) {
 		this.proyectil = proyectil;
+	}
+
+	public boolean isEscudando() {
+		return escudando;
+	}
+
+	public void setEscudando(boolean escudando) {
+		this.escudando = escudando;
+	}
+
+	public int getContadorEscudo() {
+		return contadorEscudo;
+	}
+
+	public void setContadorEscudo(int contadorEscudo) {
+		this.contadorEscudo = contadorEscudo;
+	}
+
+	public int getEstadoEscudo() {
+		return estadoEscudo;
+	}
+
+	public void setEstadoEscudo(int estadoEscudo) {
+		this.estadoEscudo = estadoEscudo;
 	}
 }

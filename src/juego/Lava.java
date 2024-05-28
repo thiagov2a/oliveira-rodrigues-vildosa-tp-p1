@@ -22,7 +22,7 @@ public class Lava {
 		this.velocidad = 0.1;
 	}
 
-	public void dibujarse(Entorno entorno) {
+	public void dibujar(Entorno entorno) {
 		entorno.dibujarImagen(GIF, this.x, this.y, 0.0);
 	}
 

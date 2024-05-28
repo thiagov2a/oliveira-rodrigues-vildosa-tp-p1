@@ -32,6 +32,42 @@ public class GestorColisiones {
 		return estaSobreBloque && estaEntreLadosBloque;
 	}
 
+	public boolean detectarColisionProyectilEnemigoPersonaje(Enemigo[] enemigos, Personaje personaje) {
+		for (Enemigo enemigo : enemigos) {
+			if (detectarColisionProyectilEnemigoPersonaje(enemigo.getProyectil(), personaje)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean detectarColisionProyectilEnemigoPersonaje(Proyectil proyectil, Personaje personaje) {
+		return (proyectil.getX() - personaje.getX()) * (proyectil.getX() - personaje.getX())
+				+ (proyectil.getY() - personaje.getY()) * (proyectil.getY() - personaje.getY()) < 40 * 40;
+	}
+
+	public boolean detectarColisionProyectilEnemigoEscudo(Enemigo[] enemigos, Personaje personaje) {
+		for (Enemigo enemigo : enemigos) {
+			if (detectarColisionProyectilEnemigoEscudo(enemigo.getProyectil(), personaje)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean detectarColisionProyectilEnemigoEscudo(Proyectil proyectil, Personaje personaje) {
+		if (personaje.isEscudando() && personaje.isDireccion()) {
+			return Math.abs(proyectil.getDerecha(true) - (personaje.getIzquierda() - 12)) < 5;
+		} else if (personaje.isEscudando() && !personaje.isDireccion()) {
+			return Math.abs(proyectil.getIzquierda(true) - (personaje.getDerecha() + 12)) < 5;
+		} else {
+			return false;
+		}
+	}
+
+	// !this.personaje.isEscudando()
+	// && (enemigo.getProyectil().isDireccion() == !this.personaje.isDireccion())
+
 	// Personaje
 
 	public boolean detectarApoyoPersonaje(Personaje personaje, Piso[] pisos) {
@@ -144,28 +180,36 @@ public class GestorColisiones {
 		return estaEnMismaAltura && estaEnBordeDER;
 	}
 
-	public boolean detectarColisionEnemigoProyectil(Personaje personaje, Enemigo[] enemigos) {
-		for (Enemigo enemigo : enemigos) {
-			if (enemigo != null && detectarColisionEnemigoProyectil(personaje, enemigo)) {
-				return true;
+	public boolean detectarColisionProyectilPersonajeEnemigo(Personaje personaje, Enemigo[] enemigos) {
+		if (personaje != null && personaje.getProyectil() != null) {
+			for (Enemigo enemigo : enemigos) {
+				if (enemigo != null && detectarColisionProyectilPersonajeEnemigo(personaje.getProyectil(), enemigo)) {
+					return true;
+				}
 			}
 		}
 		return false;
 	}
 
-	public boolean detectarColisionEnemigoProyectil(Personaje personaje, Enemigo enemigo) {
-		if (personaje != null && detectarColisionEnemigoProyectil(personaje.getProyectil(), enemigo)) {
-			return true;
+	public boolean detectarColisionProyectilPersonajeEnemigo(Proyectil proyectil, Enemigo enemigo) {
+		return (proyectil.getX() - enemigo.getX()) * (proyectil.getX() - enemigo.getX())
+				+ (proyectil.getY() - enemigo.getY()) * (proyectil.getY() - enemigo.getY()) < 40 * 40;
+	}
+
+	public boolean detectarColisionPersonajeEnemigo(Personaje personaje, Enemigo[] enemigos) {
+		if (personaje != null) {
+			for (Enemigo enemigo : enemigos) {
+				if (enemigo != null && !enemigo.isBaja() && detectarColisionPersonajeEnemigo(personaje, enemigo)) {
+					return true;
+				}
+			}
 		}
 		return false;
 	}
 
-	public boolean detectarColisionEnemigoProyectil(Proyectil proyectil, Enemigo enemigo) {
-		if (proyectil != null && enemigo != null) {
-			return (proyectil.getX() - enemigo.getX()) * (proyectil.getX() - enemigo.getX())
-					+ (proyectil.getY() - enemigo.getY()) * (proyectil.getY() - enemigo.getY()) < 50 * 50;
-		}
-		return false;
+	public boolean detectarColisionPersonajeEnemigo(Personaje personaje, Enemigo enemigo) {
+		return (personaje.getX() - enemigo.getX()) * (personaje.getX() - enemigo.getX())
+				+ (personaje.getY() - enemigo.getY()) * (personaje.getY() - enemigo.getY()) < 25 * 25;
 	}
 
 }

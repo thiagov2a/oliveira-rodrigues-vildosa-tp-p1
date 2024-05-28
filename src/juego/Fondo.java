@@ -8,22 +8,24 @@ import entorno.Herramientas;
 public class Fondo {
 
 	private static final Image IMG = Herramientas.cargarImagen("fondo.png");
-	
+	private static final Image GIF = Herramientas.cargarImagen("spawner.gif");
+
 	private double x;
 	private double y;
-	
+
 	public Fondo() {
 	}
-	
+
 	public Fondo(double x, double y) {
 		this.x = x;
 		this.y = y;
 	}
-	
+
 	public void dibujar(Entorno entorno) {
 		entorno.dibujarImagen(IMG, x, y, 0.0);
+		entorno.dibujarImagen(GIF, 425.0, 75.0, 0.0);
 	}
-	
+
 	public double getAncho() {
 		return IMG.getWidth(null);
 	}
@@ -32,7 +34,7 @@ public class Fondo {
 		return IMG.getHeight(null);
 	}
 
-	//Getters & Setters
+	// Getters & Setters
 	public double getX() {
 		return x;
 	}
@@ -52,5 +54,5 @@ public class Fondo {
 	public static Image getImg() {
 		return IMG;
 	}
-	
+
 }

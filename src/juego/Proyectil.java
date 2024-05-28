@@ -29,6 +29,7 @@ public class Proyectil {
 		this.velocidad = 5.0;
 		this.direccion = direccion;
 		this.tipo = tipo;
+		this.baja = false;
 	}
 
 	public void dibujar(Entorno entorno) {
@@ -45,9 +46,8 @@ public class Proyectil {
 	}
 
 	public void disparar(Entorno entorno) {
-		Image img = this.tipo ? FLECHA_IZQ : TRIDENTE_IZQ;
-		double limiteIzq = this.getAncho(img) / 2;
-		double limiteDer = entorno.ancho() - this.getAncho(img) / 2;
+		double limiteIzq = this.getAncho(this.tipo) / 2;
+		double limiteDer = entorno.ancho() - this.getAncho(this.tipo) / 2;
 
 		// Mueve el proyectil hacia la izquierda o la derecha según su dirección.
 		if (this.direccion && this.x >= limiteIzq) {
@@ -59,28 +59,28 @@ public class Proyectil {
 		}
 	}
 
-	public double getAncho(Image img) {
-		return img.getWidth(null);
+	public double getAncho(boolean tipo) {
+		return tipo ? FLECHA_IZQ.getWidth(null) : TRIDENTE_IZQ.getWidth(null);
 	}
 
-	public double getAlto(Image img) {
-		return img.getHeight(null);
+	public double getAlto(boolean tipo) {
+		return tipo ? FLECHA_IZQ.getWidth(null) : TRIDENTE_IZQ.getWidth(null);
 	}
 
-	public double getTecho(Image img) {
-		return this.y - this.getAlto(img) / 2;
+	public double getTecho(boolean tipo) {
+		return this.y - this.getAlto(tipo) / 2;
 	}
 
-	public double getPiso(Image img) {
-		return this.y + this.getAlto(img) / 2;
+	public double getPiso(boolean tipo) {
+		return this.y + this.getAlto(tipo) / 2;
 	}
 
-	public double getIzquierda(Image img) {
-		return this.x - this.getAncho(img) / 2;
+	public double getIzquierda(boolean tipo) {
+		return this.x - this.getAncho(tipo) / 2;
 	}
 
-	public double getDerecha(Image img) {
-		return this.x + this.getAncho(img) / 2;
+	public double getDerecha(boolean tipo) {
+		return this.x + this.getAncho(tipo) / 2;
 	}
 
 	// Getters & Setter

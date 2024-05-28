@@ -32,6 +32,7 @@ public class Enemigo {
 	private int contadorDisparo;
 	private int estadoDisparo;
 	private Proyectil proyectil;
+	private boolean baja;
 
 	public Enemigo(double x, double y) {
 		this.x = x;
@@ -42,22 +43,31 @@ public class Enemigo {
 		this.contadorDisparo = rand.nextInt(0, 20);
 		this.estadoDisparo = 0;
 		this.proyectil = null;
+		this.baja = false;
 	}
 
 	public void dibujar(Entorno entorno) {
 		Image img = seleccionarImagen();
 
-		if (this.estadoDisparo == 1 && this.disparando) {
-			if (this.direccion) {
-				entorno.dibujarImagen(img, this.x - DIFERENCIA_PX, this.y, 0.0);
+		if (!this.baja) {
+			if (this.estadoDisparo == 1 && this.disparando) {
+				if (this.direccion) {
+					entorno.dibujarImagen(img, this.x - DIFERENCIA_PX, this.y, 0.0);
+				} else {
+					entorno.dibujarImagen(img, this.x + DIFERENCIA_PX, this.y, 0.0);
+				}
 			} else {
-				entorno.dibujarImagen(img, this.x + DIFERENCIA_PX, this.y, 0.0);
+				entorno.dibujarImagen(img, this.x, this.y, 0.0);
 			}
-		} else {
-			entorno.dibujarImagen(img, this.x, this.y, 0.0);
 		}
+	}
 
-		dibujarProyectil(entorno);
+	public boolean isBaja() {
+		return baja;
+	}
+
+	public void setBaja(boolean baja) {
+		this.baja = baja;
 	}
 
 	private Image seleccionarImagen() {
@@ -65,13 +75,6 @@ public class Enemigo {
 			return this.direccion ? ARCO_IZQ : ARCO_DER;
 		} else {
 			return this.direccion ? DISPARO_IZQ : DISPARO_DER;
-		}
-	}
-
-	private void dibujarProyectil(Entorno entorno) {
-		if (this.proyectil != null) {
-			this.proyectil.disparar(entorno);
-			this.proyectil.dibujar(entorno);
 		}
 	}
 

@@ -1,15 +1,21 @@
 package juego;
 
+import java.awt.Image;
 import java.util.Random;
 import entorno.Entorno;
+import entorno.Herramientas;
 import entorno.InterfaceJuego;
 
 public class Juego extends InterfaceJuego {
+
+	private static final Image VICTORIA = Herramientas.cargarImagen("victoria.gif");
 
 	private Entorno entorno;
 	private Random rand;
 	private GestorColisiones gestorColisiones;
 	private int ticks;
+	private int tipoFinal;
+	private boolean terminado;
 
 	private Fondo fondo;
 	private Piso[] pisos;
@@ -18,16 +24,18 @@ public class Juego extends InterfaceJuego {
 	private Lava lava;
 
 	public Juego() {
-		this.entorno = new Entorno(this, "Super Elizabeth Sis, Volcano Edition - Grupo 3", 800, 600);
+		this.entorno = new Entorno(this, "Minecraft Edición 2D - Grupo 3", 800, 600);
 		this.rand = new Random();
 		this.gestorColisiones = new GestorColisiones();
 		this.ticks = 0;
+		this.tipoFinal = -1;
+		this.terminado = false;
 		inicializarJuego();
 		this.entorno.iniciar();
 	}
 
 	private void inicializarJuego() {
-		this.fondo = new Fondo(400.0, 301.0);
+		this.fondo = new Fondo(400.0, 300.0);
 		int cantidadPisos = 4;
 		this.pisos = crearPisos(cantidadPisos, 575.0);
 		this.enemigos = crearEnemigos(cantidadPisos, 500.0);
@@ -62,9 +70,14 @@ public class Juego extends InterfaceJuego {
 
 	@Override
 	public void tick() {
-		renderizarJuego();
-		ticks++;
-		System.out.println(ticks);
+		if (!terminado) {
+			renderizarJuego();
+			ticks++;
+			System.out.println(ticks);
+		} else {
+			System.out.println("LOL");
+			pantallaFinal(tipoFinal);
+		}
 	}
 
 	private void renderizarJuego() {
@@ -83,25 +96,77 @@ public class Juego extends InterfaceJuego {
 		}
 	}
 
+	// TODO: Hacer que aparezcan enemigos cuando hay menos de 2
 	private void dibujarEnemigos() {
 		for (int i = 0; i < enemigos.length; i++) {
 			Enemigo enemigo = enemigos[i];
 			if (enemigo != null) {
-				if (gestorColisiones.detectarColisionEnemigoProyectil(personaje.getProyectil(), enemigo)) {
-					personaje.setProyectil(null);
-					enemigos[i] = null;
-				} else {
-					enemigo.setApoyado(gestorColisiones.detectarApoyoEnemigo(enemigo, pisos));
-					enemigo.mover(entorno);
-					enemigo.caerDisparar(entorno);
-					enemigo.dibujar(entorno);
-				}
+				manejarColision(enemigo);
+				actualizarEstadoEnemigo(enemigo);
+				dibujarProyectilEnemigo(enemigo);
+				enemigo.dibujar(entorno);
+			}
+		}
+	}
+
+	private void manejarColision(Enemigo enemigo) {
+		if (this.personaje != null && this.personaje.getProyectil() != null && this.gestorColisiones
+				.detectarColisionProyectilPersonajeEnemigo(this.personaje.getProyectil(), enemigo)) {
+			this.personaje.setProyectil(null);
+			enemigo.setBaja(true); // Dar de baja al enemigo para que el proyectil siga en curso
+		}
+
+		if (manejarCondiciones(enemigo)
+				&& gestorColisiones.detectarColisionProyectilEnemigoPersonaje(enemigo.getProyectil(), this.personaje)) {
+			enemigo.setProyectil(null);
+			this.personaje = null;
+		}
+
+		if (manejarCondiciones(enemigo)
+				&& gestorColisiones.detectarColisionProyectilEnemigoEscudo(enemigo.getProyectil(), this.personaje)) {
+			enemigo.setProyectil(null);
+		}
+
+	}
+
+	private boolean manejarCondiciones(Enemigo enemigo) {
+		return enemigo != null && enemigo.getProyectil() != null && this.personaje != null;
+	}
+
+	private void actualizarEstadoEnemigo(Enemigo enemigo) {
+		if (enemigo.isBaja() && enemigo.getProyectil() == null) {
+			eliminarEnemigo(enemigo);
+		} else {
+			enemigo.setApoyado(gestorColisiones.detectarApoyoEnemigo(enemigo, pisos));
+			enemigo.mover(entorno);
+			enemigo.caerDisparar(entorno);
+		}
+	}
+
+	private void dibujarProyectilEnemigo(Enemigo enemigo) {
+		Proyectil proyectil = enemigo.getProyectil();
+		if (proyectil != null) {
+			proyectil.disparar(entorno);
+			proyectil.dibujar(entorno);
+		}
+	}
+
+	private void eliminarEnemigo(Enemigo enemigo) {
+		for (int i = 0; i < enemigos.length; i++) {
+			if (enemigos[i] == enemigo) {
+				enemigos[i] = null;
+				break;
 			}
 		}
 	}
 
 	private void dibujarPersonaje() {
 		if (this.personaje != null) {
+			if (gestorColisiones.detectarColisionPersonajeEnemigo(personaje, enemigos)) {
+				personaje = null;
+				return; // Retorna en caso de colisión con enemigo.
+			}
+
 			personaje.setApoyado(gestorColisiones.detectarApoyoPersonaje(personaje, pisos));
 
 			if (gestorColisiones.detectarColisionBloque(personaje, pisos)) {
@@ -129,17 +194,31 @@ public class Juego extends InterfaceJuego {
 				personaje.disparar();
 			}
 
+			if (entorno.sePresiono('z') && !personaje.isSaltando() && !personaje.isCayendo()) {
+				personaje.escudar();
+			}
+
 			personaje.cargarDisparo();
-
+			personaje.cargarEscudo();
 			personaje.caerSubir();
-
 			personaje.dibujar(entorno);
 		}
 	}
 
 	private void dibujarLava() {
 		lava.subir(entorno);
-		lava.dibujarse(entorno);
+		lava.dibujar(entorno);
+	}
+
+	private void pantallaFinal(int tipoFinal) {
+		switch (tipoFinal) {
+		case 0:
+			entorno.dibujarImagen(VICTORIA, 400.0, 300.0, 0.0);
+		case 1:
+			;
+		default:
+			;
+		}
 	}
 
 	public void detectarColisiones() {
