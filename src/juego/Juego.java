@@ -56,7 +56,6 @@ public class Juego extends InterfaceJuego {
 
 	private void actualizarJuego() {
 		renderizarJuego();
-		// manejarInteracciones();
 		verificarFinDelJuego();
 	}
 
@@ -240,7 +239,7 @@ public class Juego extends InterfaceJuego {
 	}
 
 	private boolean personajeAlcanzoMeta() {
-		return personaje.getY() < 0.0; // Assuming reaching the top of the screen is winning
+		return personaje.getY() < 0.0;
 	}
 
 	private void mostrarPantallaFinal() {
