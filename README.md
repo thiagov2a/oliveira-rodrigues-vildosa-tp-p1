@@ -13,9 +13,9 @@
 </p>
 <h3> 🧑‍🤝‍🧑 Integrantes del Grupo</h3>
 <ul>
-  <li><strong>Oliveira, Franco Nicolas:</strong> EMAIL nico_oliveira1@hotmail.com</li>
-  <li><strong>Rodrigues Cardoso, Santiago Gabriel:</strong> EMAIL santyrodrigues01@gmail.com</li>
-  <li><strong>Vildosa, Thiago Joel:</strong> EMAIL tvildosa@gmail.com</li>
+  <li><strong>Oliveira, Franco Nicolas:</strong> nico_oliveira1@hotmail.com</li>
+  <li><strong>Rodrigues Cardoso, Santiago Gabriel:</strong> santyrodrigues01@gmail.com</li>
+  <li><strong>Vildosa, Thiago Joel:</strong> tvildosa@gmail.com</li>
 </ul>
 <h3> 📝 Descripción del Trabajo</h3>
 <p>
