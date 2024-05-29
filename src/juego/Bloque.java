@@ -1,19 +1,18 @@
 package juego;
 
 import java.awt.Image;
+
 import entorno.Entorno;
 import entorno.Herramientas;
 
 public class Bloque {
 
-	// Imágenes estáticas para todos los bloques, para optimizar recursos.
 	private static final Image BEDROCK = Herramientas.cargarImagen("bedrock.png");
 	private static final Image TIERRA = Herramientas.cargarImagen("tierra.png");
 	private static final Image PIEDRA = Herramientas.cargarImagen("piedra.png");
 
 	private double x;
 	private double y;
-	// Código del tipo de bloque (-1 para bedrock, 0 para tierra, 1 para piedra)
 	private int tipo;
 
 	public Bloque(double x, double y, int tipo) {
@@ -23,8 +22,7 @@ public class Bloque {
 	}
 
 	public void dibujarse(Entorno entorno) {
-		Image img = seleccionarImagen();
-		entorno.dibujarImagen(img, this.x, this.y, 0.0);
+		entorno.dibujarImagen(seleccionarImagen(), this.x, this.y, 0.0);
 	}
 
 	private Image seleccionarImagen() {
@@ -39,11 +37,11 @@ public class Bloque {
 	}
 
 	public double getAlto() {
-		return BEDROCK.getHeight(null);
+		return seleccionarImagen().getHeight(null);
 	}
 
 	public double getAncho() {
-		return BEDROCK.getWidth(null);
+		return seleccionarImagen().getWidth(null);
 	}
 
 	public double getIzquierda() {
@@ -61,8 +59,6 @@ public class Bloque {
 	public double getPiso() {
 		return this.y + this.getAlto() / 2;
 	}
-
-	// Getter & Setters
 
 	public double getX() {
 		return x;
@@ -87,5 +83,4 @@ public class Bloque {
 	public void setTipo(int tipo) {
 		this.tipo = tipo;
 	}
-
 }

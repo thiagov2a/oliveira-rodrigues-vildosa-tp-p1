@@ -5,84 +5,78 @@ public class GestorColisiones {
 	public GestorColisiones() {
 	}
 
-	// Enemigo
-
-	public boolean detectarApoyoEnemigo(Enemigo enemigo, Piso[] pisos) {
+	public boolean enemigoApoyado(Enemigo enemigo, Piso[] pisos) {
 		for (Piso piso : pisos) {
-			if (piso != null && detectarApoyoEnemigo(enemigo, piso)) {
+			if (piso != null && apoyadoSobrePiso(enemigo, piso)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private boolean detectarApoyoEnemigo(Enemigo enemigo, Piso piso) {
+	private boolean apoyadoSobrePiso(Enemigo enemigo, Piso piso) {
 		for (Bloque bloque : piso.getBloques()) {
-			if (bloque != null && detectarApoyoEnemigo(enemigo, bloque)) {
+			if (bloque != null && apoyadoSobreBloque(enemigo, bloque)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private boolean detectarApoyoEnemigo(Enemigo enemigo, Bloque bloque) {
-		boolean estaSobreBloque = Math.abs(enemigo.getPiso() - bloque.getTecho()) < 3;
-		boolean estaEntreLadosBloque = enemigo.getDerecha() > bloque.getIzquierda()
+	private boolean apoyadoSobreBloque(Enemigo enemigo, Bloque bloque) {
+		boolean sobreBloque = Math.abs(enemigo.getPiso() - bloque.getTecho()) < 3;
+		boolean entreLadosBloque = enemigo.getDerecha() > bloque.getIzquierda()
 				&& enemigo.getIzquierda() < bloque.getDerecha();
-		return estaSobreBloque && estaEntreLadosBloque;
+		return sobreBloque && entreLadosBloque;
 	}
 
-	public boolean detectarColisionProyectilEnemigoPersonaje(Enemigo[] enemigos, Personaje personaje) {
+	public boolean proyectilEnemigoPersonaje(Enemigo[] enemigos, Personaje personaje) {
 		for (Enemigo enemigo : enemigos) {
-			if (detectarColisionProyectilEnemigoPersonaje(enemigo.getProyectil(), personaje)) {
+			if (proyectilColisionaPersonaje(enemigo.getProyectil(), personaje)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public boolean detectarColisionProyectilEnemigoPersonaje(Proyectil proyectil, Personaje personaje) {
+	public boolean proyectilColisionaPersonaje(Proyectil proyectil, Personaje personaje) {
 		return (proyectil.getX() - personaje.getX()) * (proyectil.getX() - personaje.getX())
 				+ (proyectil.getY() - personaje.getY()) * (proyectil.getY() - personaje.getY()) < 40 * 40;
 	}
 
-	public boolean detectarColisionProyectilEnemigoEscudo(Enemigo[] enemigos, Personaje personaje) {
+	public boolean proyectilEnemigoEscudo(Enemigo[] enemigos, Personaje personaje) {
 		for (Enemigo enemigo : enemigos) {
-			if (detectarColisionProyectilEnemigoEscudo(enemigo.getProyectil(), personaje)) {
+			if (proyectilColisionaEscudo(enemigo.getProyectil(), personaje)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public boolean detectarColisionProyectilEnemigoEscudo(Proyectil proyectil, Personaje personaje) {
-		if (personaje.isEscudando() && personaje.isDireccion()) {
-			return Math.abs(proyectil.getDerecha(true) - (personaje.getIzquierda() - 12)) < 5;
-		} else if (personaje.isEscudando() && !personaje.isDireccion()) {
-			return Math.abs(proyectil.getIzquierda(true) - (personaje.getDerecha() + 12)) < 5;
-		} else {
-			return false;
+	public boolean proyectilColisionaEscudo(Proyectil proyectil, Personaje personaje) {
+		if (proyectil != null && personaje != null) {
+			if (personaje.isEscudando() && personaje.isDireccion()) {
+				return Math.abs(proyectil.getDerecha() - (personaje.getIzquierda() - 12)) < 5;
+			} else if (personaje.isEscudando() && !personaje.isDireccion()) {
+				return Math.abs(proyectil.getIzquierda() - (personaje.getDerecha() + 12)) < 5;
+			}
 		}
+		return false;
 	}
 
-	// !this.personaje.isEscudando()
-	// && (enemigo.getProyectil().isDireccion() == !this.personaje.isDireccion())
-
-	// Personaje
-
-	public boolean detectarApoyoPersonaje(Personaje personaje, Piso[] pisos) {
+	public boolean personajeApoyado(Personaje personaje, Piso[] pisos) {
 		for (Piso piso : pisos) {
-			if (piso != null && detectarApoyoPersonaje(personaje, piso)) {
+			if (piso != null && apoyoSobrePiso(personaje, piso)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private boolean detectarApoyoPersonaje(Personaje personaje, Piso piso) {
+	private boolean apoyoSobrePiso(Personaje personaje, Piso piso) {
 		if (personaje != null) {
 			for (Bloque bloque : piso.getBloques()) {
-				if (bloque != null && detectarApoyoPersonaje(personaje, bloque)) {
+				if (bloque != null && apoyoSobreBloque(personaje, bloque)) {
 					return true;
 				}
 			}
@@ -90,26 +84,26 @@ public class GestorColisiones {
 		return false;
 	}
 
-	private boolean detectarApoyoPersonaje(Personaje personaje, Bloque bloque) {
-		boolean estaSobreBloque = Math.abs(personaje.getPiso() - bloque.getTecho()) < 3;
-		boolean estaEntreLadosBloque = personaje.getDerecha() > bloque.getIzquierda()
+	private boolean apoyoSobreBloque(Personaje personaje, Bloque bloque) {
+		boolean sobreBloque = Math.abs(personaje.getPiso() - bloque.getTecho()) < 3;
+		boolean entreLadosBloque = personaje.getDerecha() > bloque.getIzquierda()
 				&& personaje.getIzquierda() < bloque.getDerecha();
-		return estaSobreBloque && estaEntreLadosBloque;
+		return sobreBloque && entreLadosBloque;
 	}
 
-	public boolean detectarColisionBloque(Personaje personaje, Piso[] pisos) {
+	public boolean colisionBloque(Personaje personaje, Piso[] pisos) {
 		for (Piso piso : pisos) {
-			if (piso != null && detectarColisionBloque(personaje, piso)) {
+			if (piso != null && colisionConBloque(personaje, piso)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private boolean detectarColisionBloque(Personaje personaje, Piso piso) {
+	private boolean colisionConBloque(Personaje personaje, Piso piso) {
 		Bloque[] bloques = piso.getBloques();
 		for (int i = 0; i < bloques.length; i++) {
-			if (bloques[i] != null && detectarColisionBloque(personaje, bloques[i])) {
+			if (bloques[i] != null && colisionConBloque(personaje, bloques[i])) {
 				if (bloques[i].getTipo() == 0) {
 					bloques[i] = null;
 				}
@@ -119,26 +113,26 @@ public class GestorColisiones {
 		return false;
 	}
 
-	private boolean detectarColisionBloque(Personaje personaje, Bloque bloque) {
-		boolean estaDebajoBloque = Math.abs(personaje.getTecho() - bloque.getPiso()) < 5;
-		boolean estaEntreLadosBloque = personaje.getDerecha() > bloque.getIzquierda()
+	private boolean colisionConBloque(Personaje personaje, Bloque bloque) {
+		boolean debajoBloque = Math.abs(personaje.getTecho() - bloque.getPiso()) < 5;
+		boolean entreLadosBloque = personaje.getDerecha() > bloque.getIzquierda()
 				&& personaje.getIzquierda() < bloque.getDerecha();
-		return estaDebajoBloque && estaEntreLadosBloque;
+		return debajoBloque && entreLadosBloque;
 	}
 
-	public boolean detectarColisionBloqueIZQ(Personaje personaje, Piso[] pisos) {
+	public boolean colisionBloqueIzquierdo(Personaje personaje, Piso[] pisos) {
 		for (Piso piso : pisos) {
-			if (piso != null && detectarColisionBloqueIZQ(personaje, piso)) {
+			if (piso != null && colisionConBloqueIzquierdo(personaje, piso)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private boolean detectarColisionBloqueIZQ(Personaje personaje, Piso piso) {
+	private boolean colisionConBloqueIzquierdo(Personaje personaje, Piso piso) {
 		if (personaje != null) {
 			for (Bloque bloque : piso.getBloques()) {
-				if (bloque != null && detectarColisionBloqueIZQ(personaje, bloque)) {
+				if (bloque != null && colisionConBloqueIzquierdo(personaje, bloque)) {
 					return true;
 				}
 			}
@@ -146,26 +140,25 @@ public class GestorColisiones {
 		return false;
 	}
 
-	private boolean detectarColisionBloqueIZQ(Personaje personaje, Bloque bloque) {
-		boolean estaEnBordeIZQ = Math.abs(personaje.getDerecha() - bloque.getIzquierda()) < 3;
-		boolean estaEnMismaAltura = personaje.getPiso() > bloque.getTecho() + 2
-				&& personaje.getTecho() < bloque.getPiso();
-		return estaEnMismaAltura && estaEnBordeIZQ;
+	private boolean colisionConBloqueIzquierdo(Personaje personaje, Bloque bloque) {
+		boolean enBordeIzquierdo = Math.abs(personaje.getDerecha() - bloque.getIzquierda()) < 3;
+		boolean enMismaAltura = personaje.getPiso() > bloque.getTecho() + 2 && personaje.getTecho() < bloque.getPiso();
+		return enMismaAltura && enBordeIzquierdo;
 	}
 
-	public boolean detectarColisionBloqueDER(Personaje personaje, Piso[] pisos) {
+	public boolean colisionBloqueDerecho(Personaje personaje, Piso[] pisos) {
 		for (Piso piso : pisos) {
-			if (piso != null && detectarColisionBloqueDER(personaje, piso)) {
+			if (piso != null && colisionConBloqueDerecho(personaje, piso)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private boolean detectarColisionBloqueDER(Personaje personaje, Piso piso) {
+	private boolean colisionConBloqueDerecho(Personaje personaje, Piso piso) {
 		if (personaje != null) {
 			for (Bloque bloque : piso.getBloques()) {
-				if (bloque != null && detectarColisionBloqueDER(personaje, bloque)) {
+				if (bloque != null && colisionConBloqueDerecho(personaje, bloque)) {
 					return true;
 				}
 			}
@@ -173,33 +166,26 @@ public class GestorColisiones {
 		return false;
 	}
 
-	private boolean detectarColisionBloqueDER(Personaje personaje, Bloque bloque) {
-		boolean estaEnBordeDER = Math.abs(personaje.getIzquierda() - bloque.getDerecha()) < 3;
-		boolean estaEnMismaAltura = personaje.getPiso() > bloque.getTecho() + 2
-				&& personaje.getTecho() < bloque.getPiso();
-		return estaEnMismaAltura && estaEnBordeDER;
+	private boolean colisionConBloqueDerecho(Personaje personaje, Bloque bloque) {
+		boolean enBordeDerecho = Math.abs(personaje.getIzquierda() - bloque.getDerecha()) < 3;
+		boolean enMismaAltura = personaje.getPiso() > bloque.getTecho() + 2 && personaje.getTecho() < bloque.getPiso();
+		return enMismaAltura && enBordeDerecho;
 	}
 
-	public boolean detectarColisionProyectilPersonajeEnemigo(Personaje personaje, Enemigo[] enemigos) {
-		if (personaje != null && personaje.getProyectil() != null) {
-			for (Enemigo enemigo : enemigos) {
-				if (enemigo != null && detectarColisionProyectilPersonajeEnemigo(personaje.getProyectil(), enemigo)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public boolean detectarColisionProyectilPersonajeEnemigo(Proyectil proyectil, Enemigo enemigo) {
+	public boolean proyectilColisionaEnemigo(Proyectil proyectil, Enemigo enemigo) {
 		return (proyectil.getX() - enemigo.getX()) * (proyectil.getX() - enemigo.getX())
 				+ (proyectil.getY() - enemigo.getY()) * (proyectil.getY() - enemigo.getY()) < 40 * 40;
 	}
 
-	public boolean detectarColisionPersonajeEnemigo(Personaje personaje, Enemigo[] enemigos) {
+	public boolean proyectilColisionaProyectilEnemigo(Proyectil proyectil, Proyectil enemigo) {
+		return (proyectil.getX() - enemigo.getX()) * (proyectil.getX() - enemigo.getX())
+				+ (proyectil.getY() - enemigo.getY()) * (proyectil.getY() - enemigo.getY()) < 40 * 40;
+	}
+
+	public boolean personajeEnemigo(Personaje personaje, Enemigo[] enemigos) {
 		if (personaje != null) {
 			for (Enemigo enemigo : enemigos) {
-				if (enemigo != null && !enemigo.isBaja() && detectarColisionPersonajeEnemigo(personaje, enemigo)) {
+				if (enemigo != null && !enemigo.isBaja() && colisionaConEnemigo(personaje, enemigo)) {
 					return true;
 				}
 			}
@@ -207,9 +193,17 @@ public class GestorColisiones {
 		return false;
 	}
 
-	public boolean detectarColisionPersonajeEnemigo(Personaje personaje, Enemigo enemigo) {
+	public boolean colisionaConEnemigo(Personaje personaje, Enemigo enemigo) {
 		return (personaje.getX() - enemigo.getX()) * (personaje.getX() - enemigo.getX())
 				+ (personaje.getY() - enemigo.getY()) * (personaje.getY() - enemigo.getY()) < 25 * 25;
+	}
+
+	public boolean colisionaConLava(Personaje personaje, Lava lava) {
+		return Math.abs(personaje.getPiso() - lava.getTecho()) < 3;
+	}
+
+	public boolean enemigoColisionaConLava(Enemigo enemigo, Lava lava) {
+		return Math.abs(enemigo.getPiso() - lava.getTecho()) < 3;
 	}
 
 }

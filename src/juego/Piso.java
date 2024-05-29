@@ -13,10 +13,19 @@ public class Piso {
 		this.bloques = crearBloques(y, esPrimerPiso);
 	}
 
+	public static Piso[] crearPisos(int cantidad, double yInicial) {
+		Piso[] pisos = new Piso[cantidad];
+		for (int i = 0; i < cantidad; i++) {
+			pisos[i] = new Piso(yInicial, i == 0);
+			yInicial -= 150.0;
+		}
+		return pisos;
+	}
+
 	public void dibujarPiso(Entorno entorno) {
 		for (Bloque bloque : bloques) {
 			if (bloque != null) {
-				bloque.dibujarse(entorno);				
+				bloque.dibujarse(entorno);
 			}
 		}
 	}
@@ -31,7 +40,7 @@ public class Piso {
 			if (esPrimerPiso) {
 				tipoDeBloque = -1;
 			} else {
-				tipoDeBloque = rand.nextInt(10) < 4 ? 1 : 0; // 40% de probabilidad para el tipo 1
+				tipoDeBloque = rand.nextInt(10) < 3 ? 1 : 0; // 30% de probabilidad para el tipo 1
 			}
 			bloques[i] = new Bloque(x, y, tipoDeBloque);
 			x += 50.0;

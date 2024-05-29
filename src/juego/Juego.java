@@ -1,7 +1,6 @@
 package juego;
 
 import java.awt.Image;
-import java.util.Random;
 import entorno.Entorno;
 import entorno.Herramientas;
 import entorno.InterfaceJuego;
@@ -9,75 +8,56 @@ import entorno.InterfaceJuego;
 public class Juego extends InterfaceJuego {
 
 	private static final Image VICTORIA = Herramientas.cargarImagen("victoria.gif");
+	private static final Image PERDISTE = Herramientas.cargarImagen("perdiste.gif");
+	private static final int ANCHO_VENTANA = 800;
+	private static final int ALTO_VENTANA = 600;
+	private static final int CANTIDAD_PISOS = 4;
+	private static final int CANTIDAD_CORAZONES = 5;
 
 	private Entorno entorno;
-	private Random rand;
 	private GestorColisiones gestorColisiones;
-	private int ticks;
-	private int tipoFinal;
-	private boolean terminado;
-
+	private boolean juegoTerminado;
+	private boolean juegoGanado;
 	private Fondo fondo;
 	private Piso[] pisos;
 	private Enemigo[] enemigos;
 	private Personaje personaje;
 	private Lava lava;
+	private Corazon[] corazones;
+	private Puntaje puntaje;
 
 	public Juego() {
-		this.entorno = new Entorno(this, "Minecraft Edición 2D - Grupo 3", 800, 600);
-		this.rand = new Random();
+		this.entorno = new Entorno(this, "Minecraft Edición 2D - Grupo 3", ANCHO_VENTANA, ALTO_VENTANA);
 		this.gestorColisiones = new GestorColisiones();
-		this.ticks = 0;
-		this.tipoFinal = -1;
-		this.terminado = false;
+		this.juegoTerminado = false;
+		this.juegoGanado = false;
 		inicializarJuego();
 		this.entorno.iniciar();
 	}
 
 	private void inicializarJuego() {
-		this.fondo = new Fondo(400.0, 300.0);
-		int cantidadPisos = 4;
-		this.pisos = crearPisos(cantidadPisos, 575.0);
-		this.enemigos = crearEnemigos(cantidadPisos, 500.0);
+		this.fondo = new Fondo(ANCHO_VENTANA / 2.0, ALTO_VENTANA / 2.0);
+		this.pisos = Piso.crearPisos(CANTIDAD_PISOS, 575.0);
+		this.enemigos = Enemigo.crearEnemigos(CANTIDAD_PISOS, 500.0);
 		this.personaje = new Personaje(400.0, 500.0);
 		this.lava = new Lava(400.0, 900.0);
-	}
-
-	private Piso[] crearPisos(int cantidadPisos, double yInicial) {
-		Piso[] pisos = new Piso[cantidadPisos];
-		for (int i = 0; i < cantidadPisos; i++) {
-			boolean esPrimerPiso = (i == 0);
-			pisos[i] = new Piso(yInicial, esPrimerPiso);
-			yInicial -= 150.0; // Cambiar y para el próximo piso
-		}
-		return pisos;
-	}
-
-	private Enemigo[] crearEnemigos(int cantidadPisos, double yInicial) {
-		Enemigo[] enemigos = new Enemigo[cantidadPisos * 2];
-		int indice = 0;
-
-		for (int i = 0; i < cantidadPisos; i++) {
-			for (int j = 0; j < 2; j++) { // Crear dos enemigos por piso
-				boolean esPrimerEnemigo = (j == 0);
-				double x = esPrimerEnemigo ? rand.nextDouble(50.0, 300.0) : rand.nextDouble(500.0, 750.0);
-				enemigos[indice++] = new Enemigo(x, yInicial);
-			}
-			yInicial -= 150.0; // Cambiar y para el próximo piso
-		}
-		return enemigos;
+		this.corazones = Corazon.crearCorazones(CANTIDAD_CORAZONES, 25.0, 25.0);
+		this.puntaje = new Puntaje(25.0, 75.0);
 	}
 
 	@Override
 	public void tick() {
-		if (!terminado) {
-			renderizarJuego();
-			ticks++;
-			System.out.println(ticks);
+		if (!juegoTerminado) {
+			actualizarJuego();
 		} else {
-			System.out.println("LOL");
-			pantallaFinal(tipoFinal);
+			mostrarPantallaFinal();
 		}
+	}
+
+	private void actualizarJuego() {
+		renderizarJuego();
+		// manejarInteracciones();
+		verificarFinDelJuego();
 	}
 
 	private void renderizarJuego() {
@@ -85,7 +65,8 @@ public class Juego extends InterfaceJuego {
 		dibujarPisos();
 		dibujarEnemigos();
 		dibujarPersonaje();
-		dibujarLava();
+		lava.dibujar(entorno);
+		dibujarHUD();
 	}
 
 	private void dibujarPisos() {
@@ -110,34 +91,49 @@ public class Juego extends InterfaceJuego {
 	}
 
 	private void manejarColision(Enemigo enemigo) {
-		if (this.personaje != null && this.personaje.getProyectil() != null && this.gestorColisiones
-				.detectarColisionProyectilPersonajeEnemigo(this.personaje.getProyectil(), enemigo)) {
+		if (this.personaje == null) {
+			return;
+		}
+
+		// Colisión del proyectil del personaje con el enemigo
+		if (this.personaje.getProyectil() != null
+				&& gestorColisiones.proyectilColisionaEnemigo(this.personaje.getProyectil(), enemigo)) {
 			this.personaje.setProyectil(null);
-			enemigo.setBaja(true); // Dar de baja al enemigo para que el proyectil siga en curso
+			enemigo.setBaja(true);
+			puntaje.sumar();
 		}
 
-		if (manejarCondiciones(enemigo)
-				&& gestorColisiones.detectarColisionProyectilEnemigoPersonaje(enemigo.getProyectil(), this.personaje)) {
-			enemigo.setProyectil(null);
-			this.personaje = null;
-		}
-
-		if (manejarCondiciones(enemigo)
-				&& gestorColisiones.detectarColisionProyectilEnemigoEscudo(enemigo.getProyectil(), this.personaje)) {
+		// Colisión entre proyectiles del personaje y del enemigo
+		if (this.personaje.getProyectil() != null && enemigo.getProyectil() != null && gestorColisiones
+				.proyectilColisionaProyectilEnemigo(this.personaje.getProyectil(), enemigo.getProyectil())) {
+			this.personaje.setProyectil(null);
 			enemigo.setProyectil(null);
 		}
 
-	}
+		// Colisión del proyectil del enemigo con el personaje
+		if (enemigo.getProyectil() != null) {
+			if (gestorColisiones.proyectilColisionaPersonaje(enemigo.getProyectil(), this.personaje)) {
+				enemigo.setProyectil(null);
+				perderCorazon();
+			}
 
-	private boolean manejarCondiciones(Enemigo enemigo) {
-		return enemigo != null && enemigo.getProyectil() != null && this.personaje != null;
+			// Colisión del proyectil del enemigo con el escudo del personaje
+			if (gestorColisiones.proyectilColisionaEscudo(enemigo.getProyectil(), this.personaje)) {
+				enemigo.setProyectil(null);
+			}
+		}
+
+		// Colisión del enemigo con la lava
+		if (gestorColisiones.enemigoColisionaConLava(enemigo, this.lava)) {
+			enemigo.setBaja(true);
+		}
 	}
 
 	private void actualizarEstadoEnemigo(Enemigo enemigo) {
 		if (enemigo.isBaja() && enemigo.getProyectil() == null) {
 			eliminarEnemigo(enemigo);
 		} else {
-			enemigo.setApoyado(gestorColisiones.detectarApoyoEnemigo(enemigo, pisos));
+			enemigo.setApoyado(gestorColisiones.enemigoApoyado(enemigo, pisos));
 			enemigo.mover(entorno);
 			enemigo.caerDisparar(entorno);
 		}
@@ -161,67 +157,95 @@ public class Juego extends InterfaceJuego {
 	}
 
 	private void dibujarPersonaje() {
-		if (this.personaje != null) {
-			if (gestorColisiones.detectarColisionPersonajeEnemigo(personaje, enemigos)) {
-				personaje = null;
-				return; // Retorna en caso de colisión con enemigo.
+		if (this.personaje == null) {
+			return;
+		}
+
+		if (gestorColisiones.colisionaConLava(personaje, lava)
+				|| gestorColisiones.personajeEnemigo(personaje, enemigos)) {
+			perderCorazon();
+		}
+
+		personaje.setApoyado(gestorColisiones.personajeApoyado(personaje, pisos));
+
+		if (gestorColisiones.colisionBloque(personaje, pisos)) {
+			personaje.setSaltando(false);
+			personaje.setContadorSalto(0);
+		}
+
+		if (entorno.estaPresionada(entorno.TECLA_DERECHA)
+				&& !gestorColisiones.colisionBloqueIzquierdo(personaje, pisos)) {
+			personaje.setDireccion(false);
+			personaje.mover(entorno);
+		}
+
+		if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)
+				&& !gestorColisiones.colisionBloqueDerecho(personaje, pisos)) {
+			personaje.setDireccion(true);
+			personaje.mover(entorno);
+		}
+
+		if (entorno.sePresiono('x') && !personaje.isSaltando() && !personaje.isCayendo()) {
+			personaje.setSaltando(true);
+		}
+
+		if (entorno.sePresiono('c') && !personaje.isSaltando() && !personaje.isCayendo()) {
+			personaje.disparar();
+		}
+
+		if (entorno.sePresiono('z') && !personaje.isSaltando() && !personaje.isCayendo()) {
+			personaje.escudar();
+		}
+
+		personaje.cargarDisparo();
+		personaje.cargarEscudo();
+		personaje.caerSubir();
+		personaje.dibujar(entorno);
+	}
+
+	private void dibujarHUD() {
+		for (Corazon corazon : corazones) {
+			corazon.dibujar(entorno);
+			corazon.actualizarAnimacion();
+		}
+		this.puntaje.dibujar(entorno);
+	}
+
+	private void perderCorazon() {
+		for (int i = corazones.length - 1; i >= 0; i--) {
+			if (!corazones[i].isPerdido()) {
+				corazones[i].perder();
+				break;
 			}
-
-			personaje.setApoyado(gestorColisiones.detectarApoyoPersonaje(personaje, pisos));
-
-			if (gestorColisiones.detectarColisionBloque(personaje, pisos)) {
-				personaje.setSaltando(false);
-				personaje.setContadorSalto(0);
-			}
-
-			if (entorno.estaPresionada(entorno.TECLA_DERECHA)
-					&& !gestorColisiones.detectarColisionBloqueIZQ(personaje, pisos)) {
-				personaje.setDireccion(false);
-				personaje.mover(entorno);
-			}
-
-			if (entorno.estaPresionada(entorno.TECLA_IZQUIERDA)
-					&& !gestorColisiones.detectarColisionBloqueDER(personaje, pisos)) {
-				personaje.setDireccion(true);
-				personaje.mover(entorno);
-			}
-
-			if (entorno.sePresiono('x') && !personaje.isSaltando() && !personaje.isCayendo()) {
-				personaje.setSaltando(true);
-			}
-
-			if (entorno.sePresiono('c') && !personaje.isSaltando() && !personaje.isCayendo()) {
-				personaje.disparar();
-			}
-
-			if (entorno.sePresiono('z') && !personaje.isSaltando() && !personaje.isCayendo()) {
-				personaje.escudar();
-			}
-
-			personaje.cargarDisparo();
-			personaje.cargarEscudo();
-			personaje.caerSubir();
-			personaje.dibujar(entorno);
 		}
 	}
 
-	private void dibujarLava() {
-		lava.subir(entorno);
-		lava.dibujar(entorno);
-	}
-
-	private void pantallaFinal(int tipoFinal) {
-		switch (tipoFinal) {
-		case 0:
-			entorno.dibujarImagen(VICTORIA, 400.0, 300.0, 0.0);
-		case 1:
-			;
-		default:
-			;
+	private void verificarFinDelJuego() {
+		if (todosCorazonesPerdidos()) {
+			juegoTerminado = true;
+			juegoGanado = false;
+		}
+		if (personajeAlcanzoMeta()) {
+			juegoTerminado = true;
+			juegoGanado = true;
 		}
 	}
 
-	public void detectarColisiones() {
+	private boolean todosCorazonesPerdidos() {
+		for (Corazon corazon : corazones) {
+			if (!corazon.isPerdido())
+				return false;
+		}
+		return true;
+	}
+
+	private boolean personajeAlcanzoMeta() {
+		return personaje.getY() < 0.0; // Assuming reaching the top of the screen is winning
+	}
+
+	private void mostrarPantallaFinal() {
+		Image imagenFinal = juegoGanado ? VICTORIA : PERDISTE;
+		entorno.dibujarImagen(imagenFinal, 400.0, 300.0, 0.0);
 	}
 
 	public static void main(String[] args) {

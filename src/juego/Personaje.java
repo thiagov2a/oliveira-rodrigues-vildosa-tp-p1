@@ -8,33 +8,23 @@ import entorno.Herramientas;
 
 public class Personaje {
 
-	// Imágenes estáticas del personaje, para optimizar recursos.
-
+	private static final Image HITBOX = Herramientas.cargarImagen("personaje-hitbox.png");
 	private static final Image IZQ = Herramientas.cargarImagen("personaje-izq.png");
 	private static final Image DER = Herramientas.cargarImagen("personaje-der.png");
-
 	private static final Image ESCUDO_IZQ = Herramientas.cargarImagen("personaje-escudo-izq.png");
 	private static final Image ESCUDO_DER = Herramientas.cargarImagen("personaje-escudo-der.png");
-
 	private static final Image TRIDENTE_IZQ = Herramientas.cargarImagen("personaje-tridente-izq.png");
 	private static final Image TRIDENTE_DER = Herramientas.cargarImagen("personaje-tridente-der.png");
-
 	private static final Image TRIDENTE_ESCUDO_IZQ = Herramientas.cargarImagen("personaje-tridente-escudo-izq.png");
 	private static final Image TRIDENTE_ESCUDO_DER = Herramientas.cargarImagen("personaje-tridente-escudo-der.png");
-
 	private static final Image DISPARO_IZQ = Herramientas.cargarImagen("personaje-disparo-izq.png");
 	private static final Image DISPARO_DER = Herramientas.cargarImagen("personaje-disparo-der.png");
-
-	private static final Image HITBOX_IZQ = Herramientas.cargarImagen("personaje-hitbox-izq.png");
-	private static final Image HITBOX_DER = Herramientas.cargarImagen("personaje-hitbox-der.png");
-
 	private static final double DIFERENCIA_PX = 12.0;
 	private static final Random rand = new Random();
 
 	private double x;
 	private double y;
 	private double velocidad;
-	// Dirección actual del personaje (false indica hacia la derecha).
 	private boolean direccion;
 	private boolean apoyado;
 	private boolean cayendo;
@@ -47,9 +37,6 @@ public class Personaje {
 	private int contadorEscudo;
 	private int estadoEscudo;
 	private Proyectil proyectil;
-
-	public Personaje() {
-	}
 
 	public Personaje(double x, double y) {
 		this.x = x;
@@ -223,11 +210,11 @@ public class Personaje {
 	}
 
 	public double getAncho() {
-		return HITBOX_IZQ.getWidth(null);
+		return HITBOX.getWidth(null);
 	}
 
 	public double getAlto() {
-		return HITBOX_DER.getHeight(null);
+		return HITBOX.getHeight(null);
 	}
 
 	public double getTecho() {

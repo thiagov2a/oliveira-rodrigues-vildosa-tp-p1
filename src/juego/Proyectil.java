@@ -9,7 +9,6 @@ public class Proyectil {
 
 	private final static Image FLECHA_IZQ = Herramientas.cargarImagen("flecha-izq.png");
 	private final static Image FLECHA_DER = Herramientas.cargarImagen("flecha-der.png");
-
 	private final static Image TRIDENTE_IZQ = Herramientas.cargarImagen("tridente-izq.png");
 	private final static Image TRIDENTE_DER = Herramientas.cargarImagen("tridente-der.png");
 
@@ -33,8 +32,7 @@ public class Proyectil {
 	}
 
 	public void dibujar(Entorno entorno) {
-		Image img = seleccionarImagen();
-		entorno.dibujarImagen(img, x, y, 0.0);
+		entorno.dibujarImagen(seleccionarImagen(), x, y, 0.0);
 	}
 
 	private Image seleccionarImagen() {
@@ -46,8 +44,8 @@ public class Proyectil {
 	}
 
 	public void disparar(Entorno entorno) {
-		double limiteIzq = this.getAncho(this.tipo) / 2;
-		double limiteDer = entorno.ancho() - this.getAncho(this.tipo) / 2;
+		double limiteIzq = this.getAncho() / 2;
+		double limiteDer = entorno.ancho() - this.getAncho() / 2;
 
 		// Mueve el proyectil hacia la izquierda o la derecha según su dirección.
 		if (this.direccion && this.x >= limiteIzq) {
@@ -59,31 +57,29 @@ public class Proyectil {
 		}
 	}
 
-	public double getAncho(boolean tipo) {
-		return tipo ? FLECHA_IZQ.getWidth(null) : TRIDENTE_IZQ.getWidth(null);
+	public double getAncho() {
+		return seleccionarImagen().getWidth(null);
 	}
 
-	public double getAlto(boolean tipo) {
-		return tipo ? FLECHA_IZQ.getWidth(null) : TRIDENTE_IZQ.getWidth(null);
+	public double getAlto() {
+		return seleccionarImagen().getWidth(null);
 	}
 
-	public double getTecho(boolean tipo) {
-		return this.y - this.getAlto(tipo) / 2;
+	public double getTecho() {
+		return this.y - this.getAlto() / 2;
 	}
 
-	public double getPiso(boolean tipo) {
-		return this.y + this.getAlto(tipo) / 2;
+	public double getPiso() {
+		return this.y + this.getAlto() / 2;
 	}
 
-	public double getIzquierda(boolean tipo) {
-		return this.x - this.getAncho(tipo) / 2;
+	public double getIzquierda() {
+		return this.x - this.getAncho() / 2;
 	}
 
-	public double getDerecha(boolean tipo) {
-		return this.x + this.getAncho(tipo) / 2;
+	public double getDerecha() {
+		return this.x + this.getAncho() / 2;
 	}
-
-	// Getters & Setter
 
 	public double getX() {
 		return x;

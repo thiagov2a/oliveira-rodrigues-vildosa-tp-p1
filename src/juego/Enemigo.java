@@ -9,11 +9,10 @@ import entorno.Herramientas;
 public class Enemigo {
 
 	// Imágenes estáticas para todos los enemigos, para optimizar recursos.
+	private static final Image HITBOX = Herramientas.cargarImagen("enemigo-hitbox.png");
+
 	private static final Image IZQ = Herramientas.cargarImagen("enemigo-izq.png");
 	private static final Image DER = Herramientas.cargarImagen("enemigo-der.png");
-
-	private static final Image ARCO_IZQ = Herramientas.cargarImagen("enemigo-arco-izq.png");
-	private static final Image ARCO_DER = Herramientas.cargarImagen("enemigo-arco-der.png");
 
 	private static final Image DISPARO_IZQ = Herramientas.cargarImagen("enemigo-disparo-izq.png");
 	private static final Image DISPARO_DER = Herramientas.cargarImagen("enemigo-disparo-der.png");
@@ -46,6 +45,16 @@ public class Enemigo {
 		this.baja = false;
 	}
 
+	public static Enemigo[] crearEnemigos(int cantidadPisos, double yInicial) {
+		Enemigo[] enemigos = new Enemigo[cantidadPisos * 2];
+		for (int i = 0; i < cantidadPisos; i++) {
+			enemigos[i * 2] = new Enemigo(rand.nextDouble(50.0, 300.0), yInicial);
+			enemigos[i * 2 + 1] = new Enemigo(rand.nextDouble(500.0, 750.0), yInicial);
+			yInicial -= 150.0;
+		}
+		return enemigos;
+	}
+
 	public void dibujar(Entorno entorno) {
 		Image img = seleccionarImagen();
 
@@ -62,17 +71,9 @@ public class Enemigo {
 		}
 	}
 
-	public boolean isBaja() {
-		return baja;
-	}
-
-	public void setBaja(boolean baja) {
-		this.baja = baja;
-	}
-
 	private Image seleccionarImagen() {
 		if (this.estadoDisparo == 0) {
-			return this.direccion ? ARCO_IZQ : ARCO_DER;
+			return this.direccion ? IZQ : DER;
 		} else {
 			return this.direccion ? DISPARO_IZQ : DISPARO_DER;
 		}
@@ -140,11 +141,11 @@ public class Enemigo {
 	}
 
 	public double getAncho() {
-		return IZQ.getWidth(null);
+		return HITBOX.getWidth(null);
 	}
 
 	public double getAlto() {
-		return IZQ.getHeight(null);
+		return HITBOX.getHeight(null);
 	}
 
 	public double getTecho() {
@@ -235,5 +236,13 @@ public class Enemigo {
 
 	public void setProyectil(Proyectil proyectil) {
 		this.proyectil = proyectil;
+	}
+
+	public boolean isBaja() {
+		return baja;
+	}
+
+	public void setBaja(boolean baja) {
+		this.baja = baja;
 	}
 }
