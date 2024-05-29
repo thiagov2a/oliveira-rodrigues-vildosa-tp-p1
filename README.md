@@ -13,9 +13,9 @@
 </p>
 <h3> 🧑‍🤝‍🧑 Integrantes del Grupo</h3>
 <ul>
-  <li><strong>Oliveira, Franco Nicolas:</strong> DNI [Número de DNI]</li>
-  <li><strong>Rodrigues Cardoso, Santiago Gabriel:</strong> DNI [Número de DNI]</li>
-  <li><strong>Vildosa, Thiago Joel:</strong> DNI [Número de DNI]</li>
+  <li><strong>Oliveira, Franco Nicolas:</strong> EMAIL nico_oliveira1@hotmail.com</li>
+  <li><strong>Rodrigues Cardoso, Santiago Gabriel:</strong> EMAIL santyrodrigues01@gmail.com</li>
+  <li><strong>Vildosa, Thiago Joel:</strong> EMAIL tvildosa@gmail.com</li>
 </ul>
 <h3> 📝 Descripción del Trabajo</h3>
 <p>
@@ -34,10 +34,6 @@
 <h3> 📊 Resultados y Conclusiones</h3>
 <p>
   Logramos implementar todas las funcionalidades básicas del juego, incluyendo movimientos del personaje, obstáculos y recolección de objetos. Los desafíos incluyeron el manejo de colisiones y la optimización del código. A través de este proyecto, mejoramos nuestras habilidades de programación en Java y aprendimos la importancia de la organización del equipo y la planificación en el desarrollo de software.
-</p>
-<h3> 📁 Adjuntos</h3>
-<p>
-  <a href="URL_DEL_REPOSITORIO_DEL_CODIGO">Código fuente del proyecto</a>, <a href="URL_DE_LA_PRESENTACION">Presentación del Proyecto</a>.
 </p>
 <p align="center">
   Universidad Nacional de General Sarmiento - UNGS | Programación 1
